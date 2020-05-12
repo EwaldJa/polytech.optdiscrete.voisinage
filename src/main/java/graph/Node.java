@@ -1,12 +1,14 @@
 package graph;
 
+import java.util.Objects;
+
 /**
  * This class represents a node of a graph corresponding to the loaded dataset.
  * It models a customer, with his position, and his order.
  * The transport depot is a node with empty order.
  *
  * @author Ewald Janin, Lucas Aupoil
- * @see Graph
+ * @see Solution
  * @see Node
  * @see DeliveryTour
  */
@@ -47,4 +49,16 @@ public class Node {
                 _yPos == other._yPos &&
                 _order == other._order;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_id, _xPos, _yPos, _order);
+    }
+
+    @Override
+    public String toString() {
+        return "[Node #" + _id + " x:" + _xPos + " y:" + _yPos + " q:" + _order + "]";
+    }
+
+    public Node clone() { return new Node(_id, _xPos, _yPos, _order); }
 }

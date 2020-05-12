@@ -1,26 +1,42 @@
 package graph;
 
+import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 /**
- * This class models a delivery tour, with a subset of the Nodes of a Graph
+ * This class models a delivery tour, with a subset of the Nodes of a Solution
  *
  * @author Ewald Janin, Lucas Aupoil
- * @see Graph
+ * @see NodeMap
+ * @see Solution
  * @see Edge
  * @see Node
  */
-public class DeliveryTour {
+public class DeliveryTour implements Serializable {
 
-    private Node _transportDepot;
-    private Map<Node, List<Edge>> _tour;
+    public static final int MAX_CAPACITY = 100;
 
-    public DeliveryTour() {
+    private NodeMap _tour;
 
+    public DeliveryTour(Node deposit) {
+        _tour = new NodeMap(deposit);
     }
 
-    public void method() {
+    public DeliveryTour append(Node n) {
+        _tour.put(n);
+        return this;
+    }
 
+    public int remainingSpace() { return MAX_CAPACITY - _tour.getTotalOrders(); }
+
+    public int getTotalOrders() { return _tour.getTotalOrders(); }
+
+    public List<Node> getNodes() { return _tour.getNodes(); }
+
+    public List<Edge> getEdges() { return _tour.getEdges(); }
+
+    @Override
+    public String toString() {
+        return "Remaining capacity : " + remainingSpace() + "\n" + _tour.toString();
     }
 }
