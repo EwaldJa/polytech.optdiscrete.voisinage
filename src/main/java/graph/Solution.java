@@ -1,5 +1,6 @@
 package graph;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,10 +12,11 @@ import java.util.List;
  * @see Node
  * @see DeliveryTour
  */
-public class Solution {
+public class Solution implements Serializable {
 
     private Node _deposit;
     private List<Node> _clients;
+    private List<DeliveryTour> _deliveryTours;
 
     public Solution(Node deposit, List<Node> clients) {
         _deposit = deposit;
@@ -36,6 +38,9 @@ public class Solution {
             dt.append(_clients.get(i));
             i++;
         }
+        dt.internalSwap(_clients.get(0), _clients.get(6));
         return dt;
     }
+
+    //TODO : a method to fill randomly DeliveryTours
 }

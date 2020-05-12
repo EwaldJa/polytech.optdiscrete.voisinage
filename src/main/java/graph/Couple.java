@@ -1,6 +1,8 @@
 package graph;
 
-public class Couple<K,V> {
+import java.io.Serializable;
+
+public class Couple<K,V> implements Serializable {
 
     private K _key;
     private V _value;

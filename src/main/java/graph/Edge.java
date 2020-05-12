@@ -1,5 +1,6 @@
 package graph;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Objects;
  * @see Node
  * @see DeliveryTour
  */
-public class Edge {
+public class Edge implements Serializable {
 
     private Node _n1, _n2;
     private double _dist;

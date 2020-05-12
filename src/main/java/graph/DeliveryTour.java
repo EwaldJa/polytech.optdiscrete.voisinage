@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class DeliveryTour implements Serializable {
 
-    public static final int MAX_CAPACITY = 100;
+    public static final int MAX_CAPACITY = 100, MAX_CAPACITY_INIT = 60;
 
     private NodeMap _tour;
 
@@ -29,11 +29,15 @@ public class DeliveryTour implements Serializable {
 
     public int remainingSpace() { return MAX_CAPACITY - _tour.getTotalOrders(); }
 
+    public int remainingSpaceInit() { return MAX_CAPACITY_INIT - _tour.getTotalOrders(); }
+
     public int getTotalOrders() { return _tour.getTotalOrders(); }
 
     public List<Node> getNodes() { return _tour.getNodes(); }
 
     public List<Edge> getEdges() { return _tour.getEdges(); }
+
+    public void internalSwap(Node n1, Node n2) { _tour.internalSwap(n1, n2); }
 
     @Override
     public String toString() {

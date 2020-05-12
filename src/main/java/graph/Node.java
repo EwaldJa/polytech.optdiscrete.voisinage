@@ -1,5 +1,6 @@
 package graph;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Objects;
  * @see Node
  * @see DeliveryTour
  */
-public class Node {
+public class Node implements Serializable {
 
     private int _id, _xPos, _yPos, _order;
 
