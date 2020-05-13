@@ -1,6 +1,9 @@
 package graph;
 
+import utils.RandUtils;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,17 +23,34 @@ public class Solution implements Serializable {
 
     public Solution(Node deposit, List<Node> clients) {
         _deposit = deposit;
-        _clients = clients;
+        _clients = new ArrayList<>();
+        _deliveryTours = new ArrayList<>();
+
+        int nbOfClients = clients.size();
+        while (clients.size() > 0 && _clients.size() <= nbOfClients) {
+            DeliveryTour dt = new DeliveryTour(_deposit);
+            int clientIndex = RandUtils.randInt(0, clients.size());
+            while(clients.size() > 0 && clients.get(clientIndex).getOrder() <= dt.remainingSpaceInit()) {
+                dt.append(clients.get(clientIndex));
+                _clients.add(clients.get(clientIndex));
+                clients.remove(clients.get(clientIndex));
+                clientIndex = RandUtils.randInt(0, clients.size());
+            }
+            _deliveryTours.add(dt);
+        }
     }
 
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(_deposit).append("\n");
+        sb.append("Node list : \n\n").append(_deposit).append("\n");
         _clients.forEach(node -> sb.append(node).append("\n"));
+        sb.append("\nDelivery tours:\n\n");
+        _deliveryTours.forEach(dt -> sb.append(dt.toString()).append("\n\n"));
         return sb.toString();
     }
 
+    /*
     public DeliveryTour testTour() {
         DeliveryTour dt = new DeliveryTour(_deposit);
         int i = 0;
@@ -41,6 +61,7 @@ public class Solution implements Serializable {
         dt.internalSwap(_clients.get(0), _clients.get(6));
         return dt;
     }
+    */
 
     //TODO : a method to fill randomly DeliveryTours
 }
