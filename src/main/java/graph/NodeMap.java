@@ -53,7 +53,7 @@ public class NodeMap implements Serializable {
      */
     public List<Edge> getEdges() {
         List<Edge> edges = new ArrayList<>();
-        _tour.values().forEach(cp -> edges.add(cp.getValue()));
+        _tour.values().parallelStream().forEachOrdered(cp -> edges.add(cp.getValue()));
         return edges;
     }
 
@@ -91,7 +91,7 @@ public class NodeMap implements Serializable {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        getEdges().forEach(edge -> sb.append(edge.toString()).append("\n"));
+        getEdges().parallelStream().forEachOrdered(edge -> sb.append(edge.toString()).append("\n"));
         return sb.toString();
     }
 }
