@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This class provides useful methods to get random colors
+ *
+ * @author Lucas Aupoil, Ewald Janin
+ */
 public class ColorPicker {
 
     private static List<Color> availableColors;

@@ -1,7 +1,5 @@
 import data.DataLoader;
-//import display.DisplayResult;
 import display.DisplayResult;
-import graph.DeliveryTour;
 import graph.Solution;
 
 import javax.swing.*;

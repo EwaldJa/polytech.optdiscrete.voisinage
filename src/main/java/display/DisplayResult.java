@@ -3,6 +3,8 @@ package display;
 import graph.Node;
 import graph.Solution;
 import utils.ColorPicker;
+import utils.ForEachWrapper;
+import utils.FormatUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,6 +19,9 @@ public class DisplayResult extends JFrame {
     public static final int CANVAS_WIDTH  = 1280;
     public static final int CANVAS_HEIGHT = 720;
 
+    public static final int INFOPANEL_WIDTH  = 350;
+    public static final int INFOLINE_HEIGHT  = 40;
+
     public static final int DEPOSIT_DOT_DIAMETER = 20;
 
     private DrawCanvas _canvas;
@@ -27,7 +32,7 @@ public class DisplayResult extends JFrame {
 
         _solution = solution;
         _canvas = new DrawCanvas();    // Construct the drawing _canvas
-        _canvas.setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));
+        _canvas.setPreferredSize(new Dimension(CANVAS_WIDTH+INFOPANEL_WIDTH, CANVAS_HEIGHT));
 
         // Set the Drawing JPanel as the JFrame's content-pane
         Container cp = getContentPane();
@@ -52,9 +57,12 @@ public class DisplayResult extends JFrame {
             ColorPicker.initColors();
             // Your custom painting codes. For example,
             // Drawing primitive shapes
-
+            ForEachWrapper<Integer> dtNb = new ForEachWrapper<>(0);
             _solution.getDeliveryTours().parallelStream().forEachOrdered(tour -> {
                 g.setColor(ColorPicker.getRandomColor());
+                g.setFont(new Font("Baskerville Old Face", Font.PLAIN, 30));
+                g.drawString("#" + dtNb.value + ", cap:"+tour.remainingSpace() + ", dist:"+ FormatUtils.round(tour.getTotalDistance(),2), CANVAS_WIDTH + INFOLINE_HEIGHT/2, (dtNb.value + 1) * INFOLINE_HEIGHT + INFOLINE_HEIGHT/2);
+                dtNb.value++;
                         tour.getEdges().forEach(
                                 edge -> {
 
@@ -62,22 +70,24 @@ public class DisplayResult extends JFrame {
 
                         Node node = edge.getN1();
                         int width = node.getOrder() + 3;
-                        g.drawOval(convertPosX(node.getXPos()) - width/2, convertPosY(node.getYPos()) - width/2, width, width);
                         g.fillOval(convertPosX(node.getXPos()) - width/2, convertPosY(node.getYPos()) - width/2, width, width);
 
                         node = edge.getN2();
                         width = node.getOrder() + 3;
-                        g.drawOval(convertPosX(node.getXPos()) - width/2, convertPosY(node.getYPos()) - width/2, width, width);
                         g.fillOval(convertPosX(node.getXPos()) - width/2, convertPosY(node.getYPos()) - width/2, width, width);
                     });
                 }
             );
 
             Node deposit = _solution.getDeposit();
-            int width = DEPOSIT_DOT_DIAMETER;
             g.setColor(Color.BLACK);
-            g.drawOval(convertPosX(deposit.getXPos()) - width/2, convertPosY(deposit.getYPos()) - width/2, width, width);
-            g.fillOval(convertPosX(deposit.getXPos()) - width/2, convertPosY(deposit.getYPos()) - width/2, width, width);
+            g.drawLine(CANVAS_WIDTH + INFOLINE_HEIGHT/4, 0, CANVAS_WIDTH + INFOLINE_HEIGHT/4, CANVAS_HEIGHT);
+            g.fillRect(convertPosX(deposit.getXPos()) - DEPOSIT_DOT_DIAMETER/2, convertPosY(deposit.getYPos()) - DEPOSIT_DOT_DIAMETER/2, DEPOSIT_DOT_DIAMETER, DEPOSIT_DOT_DIAMETER);
+            g.setFont(new Font("Baskerville Old Face", Font.PLAIN, 25));
+            g.drawString("Deposit", CANVAS_WIDTH + DEPOSIT_DOT_DIAMETER + INFOLINE_HEIGHT, (dtNb.value + 1) * INFOLINE_HEIGHT + INFOLINE_HEIGHT/2);
+            g.fillRect(CANVAS_WIDTH + INFOLINE_HEIGHT/2, (dtNb.value+1) * INFOLINE_HEIGHT, DEPOSIT_DOT_DIAMETER, DEPOSIT_DOT_DIAMETER);
+            g.setFont(new Font("Baskerville Old Face", Font.PLAIN, 30));
+            g.drawString("Total dist: "+FormatUtils.round(_solution.getTotalDistance(),2), CANVAS_WIDTH + INFOLINE_HEIGHT/2, (dtNb.value + 3) * INFOLINE_HEIGHT + INFOLINE_HEIGHT/2);
 
         }
 
