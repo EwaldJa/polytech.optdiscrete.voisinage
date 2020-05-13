@@ -1,5 +1,6 @@
 package graph;
 
+import utils.ForEachWrapper;
 import utils.RandUtils;
 
 import java.io.Serializable;
@@ -93,7 +94,10 @@ public class NodeMap implements Serializable {
         internalSwap(nodes.get(indexN1), nodes.get(indexN2));
     }
 
-    //TODO : a method to swap a Node from another delivery tour
+    /**
+     * Swaps two Nodes chosen randomly, one among other's, one among this instance's
+     * @param other another NodeMap
+     */
     public void externalSwapRandom(NodeMap other) {
         Node otherNode = new ArrayList<>(other._tour.keySet()).get(RandUtils.randInt(1, other._tour.size()));
         Node localNode = new ArrayList<>(this._tour.keySet()).get(RandUtils.randInt(1, this._tour.size()));
@@ -101,6 +105,11 @@ public class NodeMap implements Serializable {
         other.replaceNode(otherNode, localNode);
     }
 
+    /**
+     * Replaces old_n by new_n in the nodes of the delivery tour
+     * @param old_n the Node to be replace
+     * @param new_n the Node replacing
+     */
     private void replaceNode(Node old_n, Node new_n) {
         Couple<Edge, Edge> old_edges = _tour.get(old_n);
         _tour.get(old_edges.getKey().getN1()).getValue().changeN2(new_n);
@@ -110,13 +119,20 @@ public class NodeMap implements Serializable {
         _tour.replaceKey(old_n, new_n);
     }
 
-
+    /**
+     * Removes a Node from other and puts it in current instance
+     * @param other another NodeMap
+     */
     public void changeNodeTour(NodeMap other) {
         Node otherNode = new ArrayList<>(other._tour.keySet()).get(RandUtils.randInt(1, other._tour.size()));
         this.put(otherNode);
         other.remove(otherNode);
     }
 
+    /**
+     * Removes the specified Node from the delivery tour
+     * @param n the Node to delete
+     */
     public void remove(Node n) {
         Couple<Edge, Edge> n_edges = _tour.get(n);
         _tour.get(n_edges.getKey().getN1()).getValue().changeN2(n_edges.getValue().getN2());
@@ -129,6 +145,13 @@ public class NodeMap implements Serializable {
      * @return the sum of the orders of all the client of this delivery tour
      */
     public int getTotalOrders() { return _totalOrders; }
+
+    public double getTotalDistance() {
+        ForEachWrapper<Double> sum = new ForEachWrapper<>(0.0);
+        getEdges().parallelStream().forEachOrdered(edge -> sum.value+=(edge.getDist()));
+        return sum.value;
+    }
+
 
     @Override
     public String toString() {

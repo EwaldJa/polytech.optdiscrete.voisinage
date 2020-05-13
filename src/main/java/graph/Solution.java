@@ -1,5 +1,6 @@
 package graph;
 
+import utils.ForEachWrapper;
 import utils.RandUtils;
 
 import java.io.Serializable;
@@ -54,4 +55,10 @@ public class Solution implements Serializable {
     public List<DeliveryTour> getDeliveryTours() { return _deliveryTours; }
 
     public Node getDeposit() { return  _deposit; }
+
+    public double getTotalDistance() {
+        ForEachWrapper<Double> val = new ForEachWrapper<>(0.0);
+        _deliveryTours.parallelStream().forEachOrdered(dt -> val.value+=(dt.getTotalDistance()));
+        return val.value;
+    }
 }

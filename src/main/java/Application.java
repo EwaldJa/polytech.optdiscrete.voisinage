@@ -12,6 +12,8 @@ public class Application {
         Solution g3205 = DataLoader.read("3205");
         System.out.println(g3205);
 
+        System.out.println("solution total distance : " + g3205.getTotalDistance());
+
         /*
         DeliveryTour dt_0_3205 = g3205.getDeliveryTours().get(0);
         DeliveryTour dt_1_3205 = g3205.getDeliveryTours().get(1);

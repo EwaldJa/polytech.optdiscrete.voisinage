@@ -25,7 +25,7 @@ public class Node implements Serializable {
     }
 
     public double getDistance(Node other) {
-        return Math.sqrt( ((this._xPos - other._xPos)^2) + ((this._yPos - other._yPos)^2) );
+        return Math.sqrt( Math.pow((this._xPos - other._xPos), 2.0) + Math.pow((this._yPos - other._yPos), 2.0) );
     }
 
     public int getId() { return _id; }

@@ -43,6 +43,8 @@ public class DeliveryTour implements Serializable {
 
     public void changeNodeTour(DeliveryTour other) { _tour.changeNodeTour(other._tour); }
 
+    public double getTotalDistance() { return _tour.getTotalDistance(); }
+
     @Override
     public String toString() {
         return "Remaining capacity : " + remainingSpace() + "\n" + _tour.toString() + "\n\n";

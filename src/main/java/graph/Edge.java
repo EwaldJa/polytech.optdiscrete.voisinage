@@ -31,6 +31,8 @@ public class Edge implements Serializable {
 
     public Node getN2() { return _n2; }
 
+    public double getDist() { return _dist; }
+
     public boolean contains(Node n) {
         return _n1.equals(n) || _n2.equals(n);
     }

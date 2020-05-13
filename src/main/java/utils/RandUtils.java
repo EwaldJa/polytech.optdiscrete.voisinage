@@ -2,6 +2,11 @@ package utils;
 
 import java.util.Random;
 
+/**
+ * This class provides useful methods to get random values
+ *
+ * @author Ewald Janin, Lucas Aupoil
+ */
 public class RandUtils {
 
     /**
