@@ -1,5 +1,7 @@
 package graph;
 
+import utils.RandUtils;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -18,12 +20,12 @@ public class NodeMap implements Serializable {
     private int _totalOrders;
 
     /*First Edge of Couple : incoming edge, and the second is the leaving edge (for instance fist one is between n1 and n2 and second one between n2 and n3)*/
-    private Map<Node, Couple<Edge, Edge>> _tour;
+    private FlexMap<Node, Couple<Edge, Edge>> _tour;
 
 
     public NodeMap(Node deposit) {
         _deposit = deposit;
-        _tour = new LinkedHashMap<>();
+        _tour = new FlexMap<>();
         Edge initEdge = new Edge(_deposit, _deposit);
         _tour.put(_deposit, new Couple<>(initEdge, initEdge.clone()));
         _lastNode = _deposit;
@@ -67,21 +69,61 @@ public class NodeMap implements Serializable {
         Couple<Edge, Edge> n2_edges = _tour.get(n2);
         /*Replaceing n1 by n2*/
         _tour.get(n1_edges.getKey().getN1()).getValue().changeN2(n2); /*edge between preceding node of n1 and n1 now lead to n2*/
-        n1_edges.getKey().changeN2(n2);
         _tour.get(n1_edges.getValue().getN2()).getKey().changeN1(n2); /*edge between n1 and following node of n1 now starts from n2*/
+        n1_edges.getKey().changeN2(n2);
         n1_edges.getValue().changeN1(n2);
         /*Replaceing n2 by n1*/
         _tour.get(n2_edges.getKey().getN1()).getValue().changeN2(n1); /*edge between preceding node of n2 and n2 now lead to n1*/
-        n2_edges.getKey().changeN2(n1);
         _tour.get(n2_edges.getValue().getN2()).getKey().changeN1(n1); /*edge between n2 and following node of n2 now starts from n1*/
+        n2_edges.getKey().changeN2(n1);
         n2_edges.getValue().changeN1(n1);
+        _tour.swapKeys(n1, n2);
     }
 
-    //TODO : a method swapping two Nodes chosen randomly among the current delivery tour
+    /**
+     * Swaps two Nodes of this delivery tour chosen randomly among all
+     */
+    public void internalSwapRandom() {
+        int indexN1 = RandUtils.randInt(1, _tour.size());
+        int indexN2 = RandUtils.randInt(1, _tour.size());
+        while (indexN1 == indexN2) {
+            indexN2 = RandUtils.randInt(1, _tour.size());
+        }
+        List<Node> nodes = new ArrayList<>(_tour.keySet());
+        internalSwap(nodes.get(indexN1), nodes.get(indexN2));
+    }
 
     //TODO : a method to swap a Node from another delivery tour
+    public void externalSwapRandom(NodeMap other) {
+        Node otherNode = new ArrayList<>(other._tour.keySet()).get(RandUtils.randInt(1, other._tour.size()));
+        Node localNode = new ArrayList<>(this._tour.keySet()).get(RandUtils.randInt(1, this._tour.size()));
+        this.replaceNode(localNode, otherNode);
+        other.replaceNode(otherNode, localNode);
+    }
 
-    //TODO : a method to copy/cut a Node from another delivery tour
+    private void replaceNode(Node old_n, Node new_n) {
+        Couple<Edge, Edge> old_edges = _tour.get(old_n);
+        _tour.get(old_edges.getKey().getN1()).getValue().changeN2(new_n);
+        _tour.get(old_edges.getValue().getN2()).getKey().changeN1(new_n);
+        old_edges.getKey().changeN2(new_n);
+        old_edges.getValue().changeN1(new_n);
+        _tour.replaceKey(old_n, new_n);
+    }
+
+
+    public void changeNodeTour(NodeMap other) {
+        Node otherNode = new ArrayList<>(other._tour.keySet()).get(RandUtils.randInt(1, other._tour.size()));
+        this.put(otherNode);
+        other.remove(otherNode);
+    }
+
+    public void remove(Node n) {
+        Couple<Edge, Edge> n_edges = _tour.get(n);
+        _tour.get(n_edges.getKey().getN1()).getValue().changeN2(n_edges.getValue().getN2());
+        _tour.get(n_edges.getValue().getN2()).getKey().changeN1(n_edges.getKey().getN1());
+        _tour.remove(n);
+        _totalOrders -= n.getOrder();
+    }
 
     /**
      * @return the sum of the orders of all the client of this delivery tour

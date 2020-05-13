@@ -17,20 +17,22 @@ public class DisplayResult extends JFrame {
     public static final int CANVAS_WIDTH  = 1280;
     public static final int CANVAS_HEIGHT = 720;
 
-    private DrawCanvas canvas;
-    private Solution _graph;
+    public static final int DEPOSIT_DOT_DIAMETER = 20;
+
+    private DrawCanvas _canvas;
+    private Solution _solution;
 
     // Constructor to set up the GUI components and event handlers
-    public DisplayResult(Solution graph) {
+    public DisplayResult(Solution solution) {
 
-        _graph = graph;
-        canvas = new DrawCanvas();    // Construct the drawing canvas
-        canvas.setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));
+        _solution = solution;
+        _canvas = new DrawCanvas();    // Construct the drawing _canvas
+        _canvas.setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));
 
         // Set the Drawing JPanel as the JFrame's content-pane
         Container cp = getContentPane();
-        cp.add(canvas);
-        // or "setContentPane(canvas);"
+        cp.add(_canvas);
+        // or "setContentPane(_canvas);"
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);   // Handle the CLOSE button
         pack();              // Either pack() the components; or setSize()
@@ -51,7 +53,7 @@ public class DisplayResult extends JFrame {
             // Your custom painting codes. For example,
             // Drawing primitive shapes
 
-            _graph.get_deliveryTours().forEach(tour -> {
+            _solution.getDeliveryTours().parallelStream().forEachOrdered(tour -> {
                 g.setColor(ColorPicker.getRandomColor());
                         tour.getEdges().forEach(
                                 edge -> {
@@ -71,6 +73,11 @@ public class DisplayResult extends JFrame {
                 }
             );
 
+            Node deposit = _solution.getDeposit();
+            int width = DEPOSIT_DOT_DIAMETER;
+            g.setColor(Color.BLACK);
+            g.drawOval(convertPosX(deposit.getXPos()) - width/2, convertPosY(deposit.getYPos()) - width/2, width, width);
+            g.fillOval(convertPosX(deposit.getXPos()) - width/2, convertPosY(deposit.getYPos()) - width/2, width, width);
 
         }
 

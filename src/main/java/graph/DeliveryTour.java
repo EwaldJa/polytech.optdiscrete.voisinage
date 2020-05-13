@@ -37,7 +37,11 @@ public class DeliveryTour implements Serializable {
 
     public List<Edge> getEdges() { return _tour.getEdges(); }
 
-    public void internalSwap(Node n1, Node n2) { _tour.internalSwap(n1, n2); }
+    public void internalSwapRandom() { _tour.internalSwapRandom(); }
+
+    public void externalSwapRandom(DeliveryTour other) { _tour.externalSwapRandom(other._tour); }
+
+    public void changeNodeTour(DeliveryTour other) { _tour.changeNodeTour(other._tour); }
 
     @Override
     public String toString() {

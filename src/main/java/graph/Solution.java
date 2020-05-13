@@ -50,21 +50,8 @@ public class Solution implements Serializable {
         return sb.toString();
     }
 
-    /*
-    public DeliveryTour testTour() {
-        DeliveryTour dt = new DeliveryTour(_deposit);
-        int i = 0;
-        while(_clients.get(i).getOrder() <= dt.remainingSpace()) {
-            dt.append(_clients.get(i));
-            i++;
-        }
-        dt.internalSwap(_clients.get(0), _clients.get(6));
-        return dt;
-    }
-    */
 
-    //TODO : a method to fill randomly DeliveryTours
+    public List<DeliveryTour> getDeliveryTours() { return _deliveryTours; }
 
-
-    public List<DeliveryTour> get_deliveryTours() { return _deliveryTours; }
+    public Node getDeposit() { return  _deposit; }
 }
