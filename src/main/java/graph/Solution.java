@@ -46,7 +46,7 @@ public class Solution implements Serializable {
         sb.append("Node list : \n\n").append(_deposit).append("\n");
         _clients.forEach(node -> sb.append(node).append("\n"));
         sb.append("\nDelivery tours:\n\n");
-        _deliveryTours.forEach(dt -> sb.append(dt.toString()).append("\n\n"));
+        _deliveryTours.parallelStream().forEach(dt -> sb.append(dt.toString()));
         return sb.toString();
     }
 

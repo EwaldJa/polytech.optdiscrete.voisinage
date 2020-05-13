@@ -41,6 +41,6 @@ public class DeliveryTour implements Serializable {
 
     @Override
     public String toString() {
-        return "Remaining capacity : " + remainingSpace() + "\n" + _tour.toString();
+        return "Remaining capacity : " + remainingSpace() + "\n" + _tour.toString() + "\n\n";
     }
 }
