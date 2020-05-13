@@ -64,4 +64,7 @@ public class Solution implements Serializable {
     */
 
     //TODO : a method to fill randomly DeliveryTours
+
+
+    public List<DeliveryTour> get_deliveryTours() { return _deliveryTours; }
 }
