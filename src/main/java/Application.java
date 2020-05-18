@@ -1,3 +1,4 @@
+import algo.SimulatedAnnealing;
 import data.DataLoader;
 import display.DisplayResult;
 import graph.DeliveryTour;
@@ -9,14 +10,12 @@ public class Application {
 
     public static void main(String[] args) {
         Solution g3205 = DataLoader.read("3205");
-
-        Solution g3205_clone = g3205.clone();
-
-
         System.out.println(g3205.toString());
-        System.out.println(g3205_clone.toString());
 
-        System.out.println(g3205.equals(g3205_clone));
+        Solution bestg3205 = new SimulatedAnnealing(1000.0, 0.995, 100, 1).processCurrent(g3205);
+
+
+        System.out.println(bestg3205.toString());
 
 
         //System.out.println(g3205);
@@ -61,7 +60,7 @@ public class Application {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new DisplayResult(g3205); // Let the constructor do the job
+                new DisplayResult(g3205); new DisplayResult(bestg3205); // Let the constructor do the job
             }
         });
 

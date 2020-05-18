@@ -67,19 +67,49 @@ public class NodeMap implements Serializable {
      * @param n2 the nodes to swap
      */
     public void internalSwap(Node n1, Node n2) {
-        Couple<Edge, Edge> n1_edges = _tour.get(n1);
-        Couple<Edge, Edge> n2_edges = _tour.get(n2);
-        /*Replaceing n1 by n2*/
-        _tour.get(n1_edges.getKey().getN1()).getValue().changeN2(n2); /*edge between preceding node of n1 and n1 now lead to n2*/
-        _tour.get(n1_edges.getValue().getN2()).getKey().changeN1(n2); /*edge between n1 and following node of n1 now starts from n2*/
-        n1_edges.getKey().changeN2(n2);
-        n1_edges.getValue().changeN1(n2);
-        /*Replaceing n2 by n1*/
-        _tour.get(n2_edges.getKey().getN1()).getValue().changeN2(n1); /*edge between preceding node of n2 and n2 now lead to n1*/
-        _tour.get(n2_edges.getValue().getN2()).getKey().changeN1(n1); /*edge between n2 and following node of n2 now starts from n1*/
-        n2_edges.getKey().changeN2(n1);
-        n2_edges.getValue().changeN1(n1);
-        _tour.swapKeys(n1, n2);
+        Couple<Edge, Edge> n1_edges = null;
+        Couple<Edge, Edge> n2_edges = null;
+        try {
+            if (n1.equals(_lastNode)) {
+                _lastNode = n2; }
+            else if (n2.equals(_lastNode)) {
+                _lastNode = n1; }
+            n1_edges = _tour.get(n1);
+            n2_edges = _tour.get(n2);
+            /*Replaceing n1 by n2*/
+            _tour.get(n1_edges.getKey().getN1()).getValue().changeN2(n2); /*edge between preceding node of n1 and n1 now lead to n2*/
+            _tour.get(n1_edges.getValue().getN2()).getKey().changeN1(n2); /*edge between n1 and following node of n1 now starts from n2*/
+            n1_edges.getKey().changeN2(n2);
+            n1_edges.getValue().changeN1(n2);
+            /*Replaceing n2 by n1*/
+            Edge key = n2_edges.getKey();
+            Node keyn1 = key.getN1();
+            Couple<Edge,Edge> couple = _tour.get(keyn1);
+            Edge value = couple.getValue();
+            Node valuen2 = value.getN2();
+            value.changeN2(n1);
+
+
+
+            //_tour.get(n2_edges.getKey().getN1()).getValue().changeN2(n1); /*edge between preceding node of n2 and n2 now lead to n1*/
+            _tour.get(n2_edges.getValue().getN2()).getKey().changeN1(n1); /*edge between n2 and following node of n2 now starts from n1*/
+            n2_edges.getKey().changeN2(n1);
+            n2_edges.getValue().changeN1(n1);
+            _tour.swapKeys(n1, n2);
+
+        } catch (Exception e) {
+            System.err.println("internalSwap");
+            e.printStackTrace();
+            System.err.println(this.toString());
+            System.err.println(n1_edges);
+            System.err.println(n1_edges.getKey().toString());
+            System.err.println(n1_edges.getValue().toString());
+            System.err.println(n2_edges);
+            System.err.println(n2_edges.getKey().toString());
+            System.err.println(n2_edges.getValue().toString());
+            System.err.println(n1.toString());
+            System.err.println(n2.toString());
+        }
     }
 
     /**
@@ -112,12 +142,26 @@ public class NodeMap implements Serializable {
      * @param new_n the Node replacing
      */
     private void replaceNode(Node old_n, Node new_n) {
-        Couple<Edge, Edge> old_edges = _tour.get(old_n);
-        _tour.get(old_edges.getKey().getN1()).getValue().changeN2(new_n);
-        _tour.get(old_edges.getValue().getN2()).getKey().changeN1(new_n);
-        old_edges.getKey().changeN2(new_n);
-        old_edges.getValue().changeN1(new_n);
-        _tour.replaceKey(old_n, new_n);
+        Couple<Edge, Edge> old_edges = null;
+        try {
+            if (old_n.equals(_lastNode)) {
+                _lastNode = new_n; }
+            old_edges = _tour.get(old_n);
+            _tour.get(old_edges.getKey().getN1()).getValue().changeN2(new_n);
+            _tour.get(old_edges.getValue().getN2()).getKey().changeN1(new_n);
+            old_edges.getKey().changeN2(new_n);
+            old_edges.getValue().changeN1(new_n);
+            _tour.replaceKey(old_n, new_n);
+        }catch (Exception e) {
+            System.err.println("replaceNode");
+            e.printStackTrace();
+            System.err.println(this.toString());
+            System.err.println(old_edges.toString());
+            System.err.println(old_edges.getKey().toString());
+            System.err.println(old_edges.getValue().toString());
+            System.err.println(old_n);
+            System.err.println(new_n);
+        }
     }
 
     /**
@@ -125,9 +169,18 @@ public class NodeMap implements Serializable {
      * @param other another NodeMap
      */
     public void changeNodeTour(NodeMap other) {
-        Node otherNode = new ArrayList<>(other._tour.keySet()).get(RandUtils.randInt(1, other._tour.size()));
-        this.put(otherNode);
-        other.remove(otherNode);
+        Node otherNode = null;
+        try {
+            otherNode = new ArrayList<>(other._tour.keySet()).get(RandUtils.randInt(1, other._tour.size()));
+            this.put(otherNode);
+            other.remove(otherNode);
+        } catch (Exception e) {
+            System.err.println("changeNodeTour");
+            e.printStackTrace();
+            System.err.println(this.toString());
+            System.err.println(other.toString());
+            System.err.println(otherNode);
+        }
     }
 
     /**
@@ -136,6 +189,9 @@ public class NodeMap implements Serializable {
      */
     public void remove(Node n) {
         Couple<Edge, Edge> n_edges = _tour.get(n);
+        if (n.equals(_lastNode)) {
+            _lastNode = n_edges.getKey().getN1();
+        }
         _tour.get(n_edges.getKey().getN1()).getValue().changeN2(n_edges.getValue().getN2());
         _tour.get(n_edges.getValue().getN2()).getKey().changeN1(n_edges.getKey().getN1());
         _tour.remove(n);

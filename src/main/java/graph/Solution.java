@@ -74,6 +74,45 @@ public class Solution implements Serializable, Cloneable {
         return clone;
     }
 
+    public Solution cloneRandom() {
+        Solution clone = clone();
+        int randomStyle = RandUtils.randInt(0, 3);
+        switch (randomStyle) {
+            default:
+            case 0:
+                clone._deliveryTours.get(RandUtils.randInt(0,clone._deliveryTours.size())).internalSwapRandom();
+                return clone;
+            case 1:
+                //les deux doivent etre de taille > 1
+                int dt1_extSwapRand = RandUtils.randInt(0, clone._deliveryTours.size());
+                while (clone._deliveryTours.get(dt1_extSwapRand).getNodes().size() <= 1) {
+                    dt1_extSwapRand = RandUtils.randInt(0, clone._deliveryTours.size());
+                }
+                int dt2_extSwapRand = RandUtils.randInt(0, clone._deliveryTours.size(), dt1_extSwapRand);
+                while (clone._deliveryTours.get(dt2_extSwapRand).getNodes().size() <= 1) {
+                    dt2_extSwapRand = RandUtils.randInt(0, clone._deliveryTours.size(), dt1_extSwapRand);
+                }
+                clone._deliveryTours.get(dt1_extSwapRand).externalSwapRandom(clone._deliveryTours.get(dt2_extSwapRand));
+                return clone;
+            case 2:
+                //le deuxieme doit etre de taille > 1
+                int dt1_chngTour = RandUtils.randInt(0, clone._deliveryTours.size());
+                int dt2_chngTour = RandUtils.randInt(0, clone._deliveryTours.size(), dt1_chngTour);
+                while (clone._deliveryTours.get(dt2_chngTour).getNodes().size() <= 1) {
+                    dt2_chngTour = RandUtils.randInt(0, clone._deliveryTours.size(), dt1_chngTour);
+                }
+                clone._deliveryTours.get(dt1_chngTour).changeNodeTour(clone._deliveryTours.get(dt2_chngTour));
+                return clone;
+        }
+    }
+
+    public boolean isBetterThan(Solution other) {
+        if (other == null) {
+            return true; }
+        else {
+            return this.getTotalDistance() < other.getTotalDistance(); }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
