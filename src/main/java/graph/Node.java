@@ -13,7 +13,7 @@ import java.util.Objects;
  * @see Node
  * @see DeliveryTour
  */
-public class Node implements Serializable {
+public class Node implements Serializable, Cloneable {
 
     private int _id, _xPos, _yPos, _order;
 

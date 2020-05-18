@@ -6,7 +6,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class FlexMap <K,V> implements Serializable, Map<K, V> {
+public class FlexMap <K extends Cloneable, V extends Cloneable> implements Serializable, Map<K, V>, Cloneable {
 
     private Map<K,V> _values;
 
@@ -37,6 +37,35 @@ public class FlexMap <K,V> implements Serializable, Map<K, V> {
         _values = new_values;
     }
 
+    public FlexMap <K,V> clone() {
+        FlexMap<K,V> clone = new FlexMap<>();
+        _values.forEach((k, v) -> clone.put((K)k.clone(), (V)v.clone()));
+        return clone;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FlexMap<K, V> flexMap = (FlexMap<K, V>) o;
+        return equalConsideringInsertionOrder(_values, flexMap._values);
+    }
+
+    public static <K, V> boolean equalConsideringInsertionOrder(
+            Map<K, V> left, Map<K, V> right) {
+
+        Iterator<Map.Entry<K, V>> leftIterator = left.entrySet().iterator();
+        Iterator<Map.Entry<K, V>> rightIterator = right.entrySet().iterator();
+        while (leftIterator.hasNext() && rightIterator.hasNext()) {
+            Map.Entry<K, V> leftEntry = leftIterator.next();
+            Map.Entry<K, V> rightEntry = rightIterator.next();
+            if (!Objects.equals(leftEntry.getKey(), rightEntry.getKey())
+                    || !Objects.equals(leftEntry.getValue(), rightEntry.getValue())) {
+                return false;
+            }
+        }
+        return !leftIterator.hasNext() && !rightIterator.hasNext();
+    }
 
     /**
      * Returns the number of key-value mappings in this map.  If the

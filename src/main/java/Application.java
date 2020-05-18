@@ -1,5 +1,6 @@
 import data.DataLoader;
 import display.DisplayResult;
+import graph.DeliveryTour;
 import graph.Solution;
 
 import javax.swing.*;
@@ -8,6 +9,15 @@ public class Application {
 
     public static void main(String[] args) {
         Solution g3205 = DataLoader.read("3205");
+
+        Solution g3205_clone = g3205.clone();
+
+
+        System.out.println(g3205.toString());
+        System.out.println(g3205_clone.toString());
+
+        System.out.println(g3205.equals(g3205_clone));
+
 
         //System.out.println(g3205);
 

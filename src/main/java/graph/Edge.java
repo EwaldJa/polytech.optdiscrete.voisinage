@@ -11,7 +11,7 @@ import java.util.Objects;
  * @see Node
  * @see DeliveryTour
  */
-public class Edge implements Serializable {
+public class Edge implements Serializable, Cloneable {
 
     private Node _n1, _n2;
     private double _dist;

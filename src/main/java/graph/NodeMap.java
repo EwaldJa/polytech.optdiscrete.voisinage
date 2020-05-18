@@ -23,6 +23,7 @@ public class NodeMap implements Serializable {
     /*First Edge of Couple : incoming edge, and the second is the leaving edge (for instance fist one is between n1 and n2 and second one between n2 and n3)*/
     private FlexMap<Node, Couple<Edge, Edge>> _tour;
 
+    private NodeMap(){}
 
     public NodeMap(Node deposit) {
         _deposit = deposit;
@@ -159,4 +160,26 @@ public class NodeMap implements Serializable {
         getEdges().parallelStream().forEachOrdered(edge -> sb.append(edge.toString()).append("\n"));
         return sb.toString();
     }
+
+    @Override
+    protected NodeMap clone() {
+        NodeMap clone = new NodeMap();
+        clone._totalOrders = this._totalOrders;
+        clone._deposit = this._deposit.clone();
+        clone._lastNode = this._lastNode.clone();
+        clone._tour = this._tour.clone();
+        return clone;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NodeMap nodeMap = (NodeMap) o;
+        return _totalOrders == nodeMap._totalOrders &&
+                Objects.equals(_deposit, nodeMap._deposit) &&
+                Objects.equals(_lastNode, nodeMap._lastNode) &&
+                Objects.equals(_tour, nodeMap._tour);
+    }
+
 }

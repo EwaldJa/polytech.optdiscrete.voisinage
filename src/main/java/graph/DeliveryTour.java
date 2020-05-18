@@ -2,6 +2,7 @@ package graph;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This class models a delivery tour, with a subset of the Nodes of a Solution
@@ -12,11 +13,13 @@ import java.util.List;
  * @see Edge
  * @see Node
  */
-public class DeliveryTour implements Serializable {
+public class DeliveryTour implements Serializable, Cloneable {
 
     public static final int MAX_CAPACITY = 100, MAX_CAPACITY_INIT = 60;
 
     private NodeMap _tour;
+
+    private DeliveryTour() {}
 
     public DeliveryTour(Node deposit) {
         _tour = new NodeMap(deposit);
@@ -48,5 +51,19 @@ public class DeliveryTour implements Serializable {
     @Override
     public String toString() {
         return "Remaining capacity : " + remainingSpace() + "\n" + _tour.toString() + "\n\n";
+    }
+
+    public DeliveryTour clone() {
+        DeliveryTour clone = new DeliveryTour();
+        clone._tour = this._tour.clone();
+        return clone;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DeliveryTour that = (DeliveryTour) o;
+        return _tour.equals(that._tour);
     }
 }
