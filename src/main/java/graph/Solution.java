@@ -59,10 +59,16 @@ public class Solution implements Serializable, Cloneable {
 
     public Node getDeposit() { return  _deposit; }
 
-    public double getTotalDistance() {
+    public double getTotalDistanceParallel() {
         ForEachWrapper<Double> val = new ForEachWrapper<>(0.0);
         _deliveryTours.parallelStream().forEachOrdered(dt -> val.value+=(dt.getTotalDistance()));
         return val.value;
+    }
+
+    public double getTotalDistance() {
+        double sum = 0.0;
+        for(DeliveryTour dt:_deliveryTours) { sum += dt.getTotalDistance(); }
+        return sum;
     }
 
     public Solution clone() {

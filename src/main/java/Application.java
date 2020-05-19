@@ -18,7 +18,7 @@ public class Application {
             }
         });
 
-        Solution bestg3205 = new SimulatedAnnealing(500, 0.99, 1000, 0.01).processCurrent(g3205);
+        Solution bestg3205 = new SimulatedAnnealing(500, 0.9999, 100).processCurrent(g3205);
 
 
         System.out.println(bestg3205.toString());

@@ -47,11 +47,12 @@ public class DeliveryTour implements Serializable, Cloneable {
 
     public void changeNodeTour(DeliveryTour other) { _tour.changeNodeTour(other._tour); }
 
-    public double getTotalDistance() { return _tour.calculateTotalDistance(); }
+    public double getTotalDistance() {
+        return _tour.getTotalDistance(); }
 
     @Override
     public String toString() {
-        return "Remaining capacity : " + remainingSpace() + "\nDistance : " + FormatUtils.round(getTotalDistance(),2) + "\n" + _tour.toString() + "\n\n";
+        return "Remaining capacity : " + remainingSpace() + "\nDistance : " + FormatUtils.round(_tour.getTotalDistance(),2) + "\nCalculated distance : " + FormatUtils.round(_tour.calculateTotalDistance(),2) + "\n" + _tour.toString() + "\n\n";
     }
 
     public DeliveryTour clone() {

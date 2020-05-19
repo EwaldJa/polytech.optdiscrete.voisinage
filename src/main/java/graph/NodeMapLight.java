@@ -1,6 +1,7 @@
 package graph;
 
 import utils.ForEachWrapper;
+import utils.MathUtils;
 import utils.RandUtils;
 
 import java.io.Serializable;
@@ -45,9 +46,26 @@ public class NodeMapLight implements Serializable {
         double n_1_to_n = n_1.getDistance(n);
         double n_1_to_deposit = n_1.getDistance(_deposit);
         double n_to_deposit = n.getDistance(_deposit);
-        _totalDistance += (n_1_to_n + n_1_to_deposit - n_to_deposit);
+        _totalDistance += (n_1_to_n + n_to_deposit - n_1_to_deposit);
         _totalOrders += n.getOrder();
         _tour.add(n);
+    }
+
+    /**
+     * Adds the node to the delivery tour, at the index position, meaning that the next node following after the one to add will be the index+1 node, and the previous one index-1
+     * @param index where you want to add the Node
+     * @param n the Node to add
+     */
+    public void put(int index, Node n) {
+        if (index < 1 || index > _tour.size()) { throw new IllegalArgumentException("Index is not greater or equal to 1 or is bigger than size : " + index); }
+        Node n_A = _tour.get(index - 1); Node n_B = _tour.get(((index + 1 >= _tour.size())?0:index + 1));
+
+        double n_A_to_n_B = n_A.getDistance(n_B);
+        double n_A_to_n = n_A.getDistance(n);
+        double n_to_n_B = n.getDistance(n_B);
+        _totalDistance += (n_A_to_n + n_to_n_B - n_A_to_n_B);
+        _totalOrders += n.getOrder();
+        _tour.add(index, n);
     }
 
     /**
@@ -95,17 +113,25 @@ public class NodeMapLight implements Serializable {
         //_totalDistance += (_tour.get(index_m - 1).getDistance(n) + _tour.get((index_m + 1 >= _tour.size())?0:index_m + 1).getDistance(n));
         //System.err.println("    total dist : " + _totalDistance);
 
+        Node n_A = _tour.get(index_n - 1);  //n-1
+        Node n_B = _tour.get(((index_n + 1 >= _tour.size())?0:index_n + 1));    //n+1
 
-        Node n_1 = _tour.get(index_n - 1); Node n_2 = _tour.get((index_n + 1 >= _tour.size())?0:index_n + 1);
-        Node m_1 = _tour.get(index_m - 1); Node m_2 = _tour.get((index_m + 1 >= _tour.size())?0:index_m + 1);
+        Node m_A = _tour.get(index_m - 1);  //m-1
+        Node m_B = _tour.get(((index_m + 1 >= _tour.size())?0:index_m + 1));    //m+1
 
-        double n_1_to_n = n_1.getDistance(n); double n_2_to_n = n_2.getDistance(n);
-        double m_1_to_m = m_1.getDistance(m); double m_2_to_m = m_2.getDistance(m);
+        //Distance to remove
+        double n_A_to_n = n_A.getDistance(n);   //n-1 vers n
+        double n_to_n_B = n.getDistance(n_B);   //n+1 vers n
 
-        double n_1_to_m = n_1.getDistance(m); double n_2_to_m = n_2.getDistance(m);
-        double m_1_to_n = m_1.getDistance(n); double m_2_to_n = m_2.getDistance(n);
+        double m_A_to_m = m_A.getDistance(m);   //m-1 vers m
+        double m_to_m_B = m.getDistance(m_B);   //m+1 vers m
 
-        _totalDistance += ( (n_1_to_m+ n_2_to_m + m_1_to_n + m_2_to_n) - (n_1_to_n + n_2_to_n + m_1_to_m + m_2_to_m) );
+        double dist_to_rem = n_A_to_n+n_to_n_B  +  m_A_to_m+m_to_m_B;
+
+
+
+
+        _totalDistance = _totalDistance - dist_to_rem;
 
 
         if (index_m > index_n) { //n first
@@ -120,6 +146,26 @@ public class NodeMapLight implements Serializable {
             _tour.add(index_m, n);
             _tour.add(index_n, m);
         }
+
+
+        n_A = _tour.get(index_n - 1);  //n-1
+        n_B = _tour.get(((index_n + 1 >= _tour.size())?0:index_n + 1));    //n+1
+
+        m_A = _tour.get(index_m - 1);  //m-1
+        m_B = _tour.get(((index_m + 1 >= _tour.size())?0:index_m + 1));    //m+1
+
+        //Distance to add
+        double n_A_to_m = n_A.getDistance(m);   //n-1 vers m
+        double m_to_n_B = m.getDistance(n_B);   //n+1 vers m
+
+        double m_A_to_n = m_A.getDistance(n);   //m-1 vers n
+        double n_to_m_B = n.getDistance(m_B);   //m+1 vers n
+
+        double dist_to_add = n_A_to_m+m_to_n_B  +  m_A_to_n+n_to_m_B;
+
+        _totalDistance = _totalDistance + dist_to_add;
+
+
         //System.err.print("    total dist : " + _totalDistance);
         //System.err.println("    total dist : " + _totalDistance);
         //System.err.println("    n-1 to m: " + _tour.get(index_n - 1).getDistance(m) + ", n+1 to m : " + _tour.get((index_n + 1 >= _tour.size())?0:index_n + 1).getDistance(m) + ", sum : " + (_tour.get(index_n - 1).getDistance(m)+_tour.get((index_n + 1 >= _tour.size())?0:index_n + 1).getDistance(m)));
@@ -166,7 +212,7 @@ public class NodeMapLight implements Serializable {
         double n_1_to_old = n_1.getDistance(old_n); double n_2_to_old = n_2.getDistance(old_n);
         double n_1_to_new = n_1.getDistance(new_n); double n_2_to_new = n_2.getDistance(new_n);
 
-        _totalDistance += ( (n_1_to_new + n_2_to_new) - (n_1_to_old + n_2_to_old) );
+        _totalDistance = _totalDistance + ( (n_1_to_new + n_2_to_new) - (n_1_to_old + n_2_to_old) );
         _totalOrders += (new_n.getOrder() - old_n.getOrder());
         _tour.remove(old_n);
         _tour.add(index_old, new_n);
@@ -200,8 +246,8 @@ public class NodeMapLight implements Serializable {
     public void removeSafe(Node n) {
         int index_n = _tour.indexOf(n);
         Node n_1 = _tour.get(index_n - 1); Node n_2 = _tour.get((index_n + 1 >= _tour.size())?0:index_n + 1);
-        double n_1_to_n = n_1.getDistance(n); double n_2_to_n = n_2.getDistance(n);
-        _totalDistance -= (n_1_to_n + n_2_to_n);
+        double n_1_to_n = n_1.getDistance(n); double n_2_to_n = n_2.getDistance(n); double n_1_to_n_2 = n_1.getDistance(n_2);
+        _totalDistance = _totalDistance - (n_1_to_n + n_2_to_n) + n_1_to_n_2;
         _totalOrders -= n.getOrder();
         _tour.remove(n);
     }
@@ -216,7 +262,7 @@ public class NodeMapLight implements Serializable {
      * @return remaining space as of the capacity defined in DeliveryTour
      * @see DeliveryTour#MAX_CAPACITY
      */
-    public int getRemainingSpace() { return DeliveryTour.MAX_CAPACITY - getTotalOrders(); }
+    public int getRemainingSpace() { return DeliveryTour.MAX_CAPACITY - _totalOrders; }
 
     /**
      * @return the total distance between all the clients of this delivery tour
