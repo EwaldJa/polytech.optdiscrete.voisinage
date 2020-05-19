@@ -6,7 +6,7 @@ import utils.RandUtils;
 
 public class SimulatedAnnealing extends Algorithm {
 
-    public static final int MAX_ITER_SAME_VALUE = 10;
+    public static final int MAX_ITER_SAME_VALUE = 50;
 
     private double _temperature, _coolingFactor, _epsilon;
     private int _neighbourNb;
@@ -15,6 +15,7 @@ public class SimulatedAnnealing extends Algorithm {
         this._temperature = temperature;
         this._coolingFactor = coolingFactor;
         this._neighbourNb = neighbourNb;
+        this._epsilon = epsilon;
     }
 
     @Override
@@ -24,32 +25,38 @@ public class SimulatedAnnealing extends Algorithm {
         double bestDistance = bestSolution.getTotalDistance();
         Solution baseSolution = current.clone();
         double baseDistance = baseSolution.getTotalDistance();
+        double oldBaseDistance = baseDistance;
         for(double t = _temperature; t > 1; t *= _coolingFactor) {
-            System.out.println("Temperature : " + t + ", bestDistance : " + bestDistance);
-            Solution bestNeighbour = null;
             for(int i = 0; i < _neighbourNb; i++) {
                 Solution rndmNeighbour = baseSolution.cloneRandom();
-                if (rndmNeighbour.isBetterThan(bestNeighbour)) { bestNeighbour = rndmNeighbour; }
+                double rndmDist = rndmNeighbour.getTotalDistance();
+
+
+                if (rndmDist < baseDistance) {
+                    baseSolution = rndmNeighbour;
+                    baseDistance = rndmDist;
+                    if (rndmDist < bestDistance) {
+                        bestSolution = rndmNeighbour;
+                        bestDistance = rndmDist;
+                    } }
+                else if (RandUtils.randDouble(0,1) <= MathUtils.exp(baseDistance, rndmDist, t)) {
+                    baseSolution = rndmNeighbour;
+                    baseDistance = rndmDist;
+                    //System.err.println("    Exploration, baseDistance : " + baseDistance + " expo: " + MathUtils.exp(baseDistance, rndmDist, t));
+                }
             }
-            if (bestNeighbour.getTotalDistance() < baseDistance) {
-                baseSolution = bestNeighbour;
-                baseDistance = bestNeighbour.getTotalDistance();
-                if (bestNeighbour.getTotalDistance() < bestDistance) {
-                    bestSolution = bestNeighbour;
-                    bestDistance = bestNeighbour.getTotalDistance();
-                } }
-            else if (RandUtils.randDouble(0,1) <= MathUtils.exp(baseDistance, bestNeighbour.getTotalDistance(), t)) {
-                baseSolution = bestNeighbour;
-                baseDistance = bestNeighbour.getTotalDistance();
-            }
-            if (MathUtils.areEquals(bestDistance, baseDistance, _epsilon)) {
+/*
+            if (MathUtils.areEquals(oldBaseDistance, baseDistance, _epsilon)) {
+                System.out.println("    Iter same value : "+iter_same_value + ", oldBaseDistance : " + oldBaseDistance);
                 iter_same_value++;
-                if (iter_same_value >= 10) {
+                if (iter_same_value >= MAX_ITER_SAME_VALUE) {
                     return bestSolution; } }
             else {
                 iter_same_value = 0; }
-        }
+            oldBaseDistance = baseDistance;*/
 
+            System.out.println("Temperature : " + t + ", bestDistance : " + bestDistance + ", baseDistance : " + baseDistance);
+        }
         return bestSolution;
     }
 }

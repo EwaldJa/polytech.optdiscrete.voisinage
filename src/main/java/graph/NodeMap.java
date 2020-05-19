@@ -19,6 +19,7 @@ public class NodeMap implements Serializable {
 
     private Node _deposit, _lastNode;
     private int _totalOrders;
+    private double _totalDistance;
 
     /*First Edge of Couple : incoming edge, and the second is the leaving edge (for instance fist one is between n1 and n2 and second one between n2 and n3)*/
     private FlexMap<Node, Couple<Edge, Edge>> _tour;
@@ -31,6 +32,7 @@ public class NodeMap implements Serializable {
         Edge initEdge = new Edge(_deposit, _deposit);
         _tour.put(_deposit, new Couple<>(initEdge, initEdge.clone()));
         _lastNode = _deposit;
+        _totalDistance = 0.0;
     }
 
     /**
@@ -38,13 +40,14 @@ public class NodeMap implements Serializable {
      * @param n the node to add
      */
     public void put(Node n) {
-        _totalOrders += n.getOrder(); /*keeps tracking of capacity up to date*/
         Edge last_with_n = _tour.get(_lastNode).getValue();
         last_with_n.changeN2(n); /*makes the node that was the last before be the one preceding the node we are adding*/
         Edge n_with_deposit = _tour.get(_deposit).getKey();
         n_with_deposit.changeN1(n); /*makes the departing edge of the newly added node leading to the origin node*/
         _tour.put(n, new Couple<>(last_with_n.clone(), n_with_deposit.clone()));
+        //_totalDistance += _lastNode.getDistance(n) + _deposit.getDistance(n);
         _lastNode = n;
+        _totalOrders += n.getOrder(); /*keeps tracking of capacity up to date*/
     }
 
     /**
@@ -61,54 +64,65 @@ public class NodeMap implements Serializable {
         return edges;
     }
 
+
     /**
      * Swaps the two specified Nodes in this delivery tour. They both must be Nodes of this tour.
-     * @param n1 the nodes to swap
-     * @param n2 the nodes to swap
+     * @param n one of the nodes to swap
+     * @param m the other node to swap
      */
-    public void internalSwap(Node n1, Node n2) {
-        Couple<Edge, Edge> n1_edges = null;
-        Couple<Edge, Edge> n2_edges = null;
+    public void internalSwapSafe(Node n, Node m) {
+        Couple<Edge, Edge> n_1_edges = null;    //n-1
+        Couple<Edge, Edge> n_edges = null;      //n
+        Couple<Edge, Edge> n_2_edges = null;   //n+1
+        Couple<Edge, Edge> m_1_edges = null;    //m-1
+        Couple<Edge, Edge> m_edges = null;      //m
+        Couple<Edge, Edge> m_2_edges = null;   //m+1
+        Node n1,n2,m1,m2;
+
         try {
-            if (n1.equals(_lastNode)) {
-                _lastNode = n2; }
-            else if (n2.equals(_lastNode)) {
-                _lastNode = n1; }
-            n1_edges = _tour.get(n1);
-            n2_edges = _tour.get(n2);
-            /*Replaceing n1 by n2*/
-            _tour.get(n1_edges.getKey().getN1()).getValue().changeN2(n2); /*edge between preceding node of n1 and n1 now lead to n2*/
-            _tour.get(n1_edges.getValue().getN2()).getKey().changeN1(n2); /*edge between n1 and following node of n1 now starts from n2*/
-            n1_edges.getKey().changeN2(n2);
-            n1_edges.getValue().changeN1(n2);
-            /*Replaceing n2 by n1*/
-            Edge key = n2_edges.getKey();
-            Node keyn1 = key.getN1();
-            Couple<Edge,Edge> couple = _tour.get(keyn1);
-            Edge value = couple.getValue();
-            Node valuen2 = value.getN2();
-            value.changeN2(n1);
+            if (n.equals(_lastNode)) {
+                _lastNode = m; }
+            else if (m.equals(_lastNode)) {
+                _lastNode = n; }
 
+            n_edges = _tour.get(n);
+            n1 = n_edges.getKey().getN1();
+            n2 = n_edges.getValue().getN2();
+            n_1_edges = _tour.get(n1);
+            n_2_edges = _tour.get(n2);
 
+            m_edges = _tour.get(m);
+            m1 = m_edges.getKey().getN1();
+            m2 = m_edges.getValue().getN2();
+            m_1_edges = _tour.get(m1);
+            m_2_edges = _tour.get(m2);
 
-            //_tour.get(n2_edges.getKey().getN1()).getValue().changeN2(n1); /*edge between preceding node of n2 and n2 now lead to n1*/
-            _tour.get(n2_edges.getValue().getN2()).getKey().changeN1(n1); /*edge between n2 and following node of n2 now starts from n1*/
-            n2_edges.getKey().changeN2(n1);
-            n2_edges.getValue().changeN1(n1);
-            _tour.swapKeys(n1, n2);
+            //_totalDistance -= n.getDistance(n1);
+            //_totalDistance -= n.getDistance(n2);
+            //_totalDistance -= m.getDistance(m1);
+            //_totalDistance -= m.getDistance(m2);
+
+            //_totalDistance += m.getDistance(n1);
+            //_totalDistance += m.getDistance(n2);
+            //_totalDistance += n.getDistance(m1);
+            //_totalDistance += n.getDistance(m2);
+
+            n_1_edges.getValue().changeN2(m);
+            n_2_edges.getKey().changeN1(m);
+            n_edges.getKey().changeN2(m);
+            n_edges.getValue().changeN1(m);
+
+            m_1_edges.getValue().changeN2(n);
+            m_2_edges.getKey().changeN1(n);
+            m_edges.getKey().changeN2(n);
+            m_edges.getValue().changeN1(n);
+
+            _tour.swapKeys(n, m);
 
         } catch (Exception e) {
             System.err.println("internalSwap");
             e.printStackTrace();
             System.err.println(this.toString());
-            System.err.println(n1_edges);
-            System.err.println(n1_edges.getKey().toString());
-            System.err.println(n1_edges.getValue().toString());
-            System.err.println(n2_edges);
-            System.err.println(n2_edges.getKey().toString());
-            System.err.println(n2_edges.getValue().toString());
-            System.err.println(n1.toString());
-            System.err.println(n2.toString());
         }
     }
 
@@ -122,7 +136,7 @@ public class NodeMap implements Serializable {
             indexN2 = RandUtils.randInt(1, _tour.size());
         }
         List<Node> nodes = new ArrayList<>(_tour.keySet());
-        internalSwap(nodes.get(indexN1), nodes.get(indexN2));
+        internalSwapSafe(nodes.get(indexN1), nodes.get(indexN2));
     }
 
     /**
@@ -132,25 +146,45 @@ public class NodeMap implements Serializable {
     public void externalSwapRandom(NodeMap other) {
         Node otherNode = new ArrayList<>(other._tour.keySet()).get(RandUtils.randInt(1, other._tour.size()));
         Node localNode = new ArrayList<>(this._tour.keySet()).get(RandUtils.randInt(1, this._tour.size()));
-        this.replaceNode(localNode, otherNode);
-        other.replaceNode(otherNode, localNode);
+        if (localNode.getOrder() - otherNode.getOrder() > (DeliveryTour.MAX_CAPACITY - this.getTotalOrders()) ||
+                otherNode.getOrder() - localNode.getOrder() > (DeliveryTour.MAX_CAPACITY - other.getTotalOrders())) { return; }
+        else {
+            this.replaceNodeSafe(localNode, otherNode);
+            this._totalOrders += otherNode.getOrder() - localNode.getOrder();
+            other.replaceNodeSafe(otherNode, localNode);
+            other._totalOrders += localNode.getOrder() - otherNode.getOrder(); }
     }
+
 
     /**
      * Replaces old_n by new_n in the nodes of the delivery tour
      * @param old_n the Node to be replace
      * @param new_n the Node replacing
      */
-    private void replaceNode(Node old_n, Node new_n) {
+    private void replaceNodeSafe(Node old_n, Node new_n) {
+        Couple<Edge, Edge> old_1_edges = null;  //n-1
         Couple<Edge, Edge> old_edges = null;
+        Couple<Edge, Edge> old_2_edges = null;  //n+1
+        Node n1,n2;
         try {
             if (old_n.equals(_lastNode)) {
                 _lastNode = new_n; }
             old_edges = _tour.get(old_n);
-            _tour.get(old_edges.getKey().getN1()).getValue().changeN2(new_n);
-            _tour.get(old_edges.getValue().getN2()).getKey().changeN1(new_n);
+            n1 = old_edges.getKey().getN1();
+            n2 = old_edges.getValue().getN2();
+            old_1_edges = _tour.get(n1);
+            old_2_edges = _tour.get(n2);
+
+            //_totalDistance -= old_n.getDistance(n1);
+            //_totalDistance -= old_n.getDistance(n2);
+            //_totalDistance += new_n.getDistance(n1);
+            //_totalDistance += new_n.getDistance(n2);
+
+            old_1_edges.getValue().changeN2(new_n);
+            old_2_edges.getKey().changeN1(new_n);
             old_edges.getKey().changeN2(new_n);
             old_edges.getValue().changeN1(new_n);
+
             _tour.replaceKey(old_n, new_n);
         }catch (Exception e) {
             System.err.println("replaceNode");
@@ -172,8 +206,10 @@ public class NodeMap implements Serializable {
         Node otherNode = null;
         try {
             otherNode = new ArrayList<>(other._tour.keySet()).get(RandUtils.randInt(1, other._tour.size()));
-            this.put(otherNode);
-            other.remove(otherNode);
+            if (otherNode.getOrder() > (DeliveryTour.MAX_CAPACITY - this.getTotalOrders())) { return; }
+            else {
+                this.put(otherNode);
+                other.removeSafe(otherNode); }
         } catch (Exception e) {
             System.err.println("changeNodeTour");
             e.printStackTrace();
@@ -183,19 +219,40 @@ public class NodeMap implements Serializable {
         }
     }
 
+
     /**
      * Removes the specified Node from the delivery tour
      * @param n the Node to delete
      */
-    public void remove(Node n) {
-        Couple<Edge, Edge> n_edges = _tour.get(n);
-        if (n.equals(_lastNode)) {
-            _lastNode = n_edges.getKey().getN1();
+    public void removeSafe(Node n) {
+        Couple<Edge, Edge> n_1_edges = null;    //n-1
+        Couple<Edge, Edge> n_edges = null;
+        Couple<Edge, Edge> n_2_edges = null;    //n+1
+        Node n1,n2;
+        try {
+            n_edges = _tour.get(n);
+            n1 = n_edges.getKey().getN1();
+            n2 = n_edges.getValue().getN2();
+            n_1_edges = _tour.get(n1);
+            n_2_edges = _tour.get(n2);
+
+
+            //_totalDistance -= n.getDistance(n1);
+            //_totalDistance -= n.getDistance(n2);
+
+            if (n.equals(_lastNode)) {
+                _lastNode = n1;
+            }
+
+            n_1_edges.getValue().changeN2(n2);
+            n_2_edges.getKey().changeN1(n1);
+
+            _totalOrders -= n.getOrder();
+            _tour.remove(n);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(this.toString());
         }
-        _tour.get(n_edges.getKey().getN1()).getValue().changeN2(n_edges.getValue().getN2());
-        _tour.get(n_edges.getValue().getN2()).getKey().changeN1(n_edges.getKey().getN1());
-        _tour.remove(n);
-        _totalOrders -= n.getOrder();
     }
 
     /**
@@ -204,6 +261,11 @@ public class NodeMap implements Serializable {
     public int getTotalOrders() { return _totalOrders; }
 
     public double getTotalDistance() {
+        //return _totalDistance;
+        return calculateTotalDistance();
+    }
+
+    public double calculateTotalDistance() {
         ForEachWrapper<Double> sum = new ForEachWrapper<>(0.0);
         getEdges().parallelStream().forEachOrdered(edge -> sum.value+=(edge.getDist()));
         return sum.value;
@@ -221,6 +283,7 @@ public class NodeMap implements Serializable {
     protected NodeMap clone() {
         NodeMap clone = new NodeMap();
         clone._totalOrders = this._totalOrders;
+        clone._totalDistance = this._totalDistance;
         clone._deposit = this._deposit.clone();
         clone._lastNode = this._lastNode.clone();
         clone._tour = this._tour.clone();

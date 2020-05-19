@@ -7,7 +7,7 @@ public class MathUtils {
     }
 
     public static double exp(double baseDist, double dist, double temp) {
-        return Math.exp(((-Math.abs(baseDist - dist)/temp)));
+        return Math.exp((-((dist - baseDist))/temp));
     }
 
 }

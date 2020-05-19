@@ -1,7 +1,6 @@
 import algo.SimulatedAnnealing;
 import data.DataLoader;
 import display.DisplayResult;
-import graph.DeliveryTour;
 import graph.Solution;
 
 import javax.swing.*;
@@ -12,7 +11,7 @@ public class Application {
         Solution g3205 = DataLoader.read("3205");
         System.out.println(g3205.toString());
 
-        Solution bestg3205 = new SimulatedAnnealing(1000.0, 0.995, 100, 1).processCurrent(g3205);
+        Solution bestg3205 = new SimulatedAnnealing(500, 0.99, 100, 0.01).processCurrent(g3205);
 
 
         System.out.println(bestg3205.toString());

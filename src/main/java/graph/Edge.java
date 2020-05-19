@@ -14,12 +14,10 @@ import java.util.Objects;
 public class Edge implements Serializable, Cloneable {
 
     private Node _n1, _n2;
-    private double _dist;
 
     public Edge(Node n1, Node n2) {
         _n1 = n1;
         _n2 = n2;
-        _dist = _n1.getDistance(_n2);
     }
 
     @Override
@@ -31,22 +29,18 @@ public class Edge implements Serializable, Cloneable {
 
     public Node getN2() { return _n2; }
 
-    public double getDist() { return _dist; }
+    public double getDist() { return _n1.getDistance(_n2); }
 
     public boolean contains(Node n) {
         return _n1.equals(n) || _n2.equals(n);
     }
 
-    public double changeN1(Node newN1) {
+    public void changeN1(Node newN1) {
         _n1 = newN1;
-        _dist = _n2.getDistance(_n1);
-        return _dist;
     }
 
-    public double changeN2(Node newN2) {
+    public void changeN2(Node newN2) {
         _n2 = newN2;
-        _dist = _n1.getDistance(_n2);
-        return _dist;
     }
 
     @Override
@@ -60,7 +54,7 @@ public class Edge implements Serializable, Cloneable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(_n1, _n2, _dist);
+        return Objects.hash(_n1, _n2);
     }
 
     public Edge clone() { return new Edge(_n1.clone(), _n2.clone()); }

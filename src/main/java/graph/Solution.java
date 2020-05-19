@@ -80,7 +80,11 @@ public class Solution implements Serializable, Cloneable {
         switch (randomStyle) {
             default:
             case 0:
-                clone._deliveryTours.get(RandUtils.randInt(0,clone._deliveryTours.size())).internalSwapRandom();
+                int dt_intRndmSwap = RandUtils.randInt(0,clone._deliveryTours.size());
+                while (clone._deliveryTours.get(dt_intRndmSwap).getNodes().size() <= 2) {
+                    dt_intRndmSwap = RandUtils.randInt(0, clone._deliveryTours.size());
+                }
+                clone._deliveryTours.get(dt_intRndmSwap).internalSwapRandom();
                 return clone;
             case 1:
                 //les deux doivent etre de taille > 1

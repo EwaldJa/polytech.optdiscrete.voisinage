@@ -232,7 +232,7 @@ public class FlexMap <K extends Cloneable, V extends Cloneable> implements Seria
     /**
      * Copies all of the mappings from the specified map to this map
      * (optional operation).  The effect of this call is equivalent to that
-     * of calling {@link #put(Object,Object) put(k, v)} on this map once
+     * of calling {@link #put(K,V)} on this map once
      * for each mapping from key {@code k} to value {@code v} in the
      * specified map.  The behavior of this operation is undefined if the
      * specified map is modified while the operation is in progress.

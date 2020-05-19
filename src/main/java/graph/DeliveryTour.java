@@ -1,8 +1,9 @@
 package graph;
 
+import utils.FormatUtils;
+
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * This class models a delivery tour, with a subset of the Nodes of a Solution
@@ -17,12 +18,12 @@ public class DeliveryTour implements Serializable, Cloneable {
 
     public static final int MAX_CAPACITY = 100, MAX_CAPACITY_INIT = 60;
 
-    private NodeMap _tour;
+    private NodeMapLight _tour;
 
     private DeliveryTour() {}
 
     public DeliveryTour(Node deposit) {
-        _tour = new NodeMap(deposit);
+        _tour = new NodeMapLight(deposit);
     }
 
     public DeliveryTour append(Node n) {
@@ -50,7 +51,7 @@ public class DeliveryTour implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        return "Remaining capacity : " + remainingSpace() + "\n" + _tour.toString() + "\n\n";
+        return "Remaining capacity : " + remainingSpace() + "\nDistance : " + FormatUtils.round(getTotalDistance(),2) + "\n" + _tour.toString() + "\n\n";
     }
 
     public DeliveryTour clone() {
