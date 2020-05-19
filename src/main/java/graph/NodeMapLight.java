@@ -41,7 +41,11 @@ public class NodeMapLight implements Serializable {
      * @param n the node to add
      */
     public void put(Node n) {
-        _totalDistance += (_tour.get(_tour.size() - 1).getDistance(n) +_deposit.getDistance(n) - _tour.get(_tour.size() - 1).getDistance(_deposit));
+        Node n_1 = _tour.get(_tour.size() - 1);
+        double n_1_to_n = n_1.getDistance(n);
+        double n_1_to_deposit = n_1.getDistance(_deposit);
+        double n_to_deposit = n.getDistance(_deposit);
+        _totalDistance += (n_1_to_n + n_1_to_deposit - n_to_deposit);
         _totalOrders += n.getOrder();
         _tour.add(n);
     }
@@ -158,18 +162,22 @@ public class NodeMapLight implements Serializable {
      */
     private void replaceNodeSafe(Node old_n, Node new_n) {
         int index_old = _tour.indexOf(old_n);
+        Node n_1 = _tour.get(index_old - 1); Node n_2 = _tour.get((index_old + 1 >= _tour.size())?0:index_old + 1);
+        double n_1_to_old = n_1.getDistance(old_n); double n_2_to_old = n_2.getDistance(old_n);
+        double n_1_to_new = n_1.getDistance(new_n); double n_2_to_new = n_2.getDistance(new_n);
+
+        _totalDistance += ( (n_1_to_new + n_2_to_new) - (n_1_to_old + n_2_to_old) );
+        _totalOrders += (new_n.getOrder() - old_n.getOrder());
+        _tour.remove(old_n);
+        _tour.add(index_old, new_n);
+
         //System.err.println("    old_n: " + old_n.toString() + ", new_n : " + new_n.toString());
         //System.err.println("    n-1: " + _tour.get(index_old - 1).toString() + ", n+1 : " + _tour.get((index_old + 1 >= _tour.size())?0:index_old + 1).toString());
         //System.err.println("    n-1 to old_n: " + _tour.get(index_old - 1).getDistance(old_n) + ", n+1 to old_n : " + _tour.get((index_old + 1 >= _tour.size())?0:index_old + 1).getDistance(old_n));
         //System.err.println("    n-1 to new_n: " + _tour.get(index_old - 1).getDistance(new_n) + ", n+1 to new_n : " + _tour.get((index_old + 1 >= _tour.size())?0:index_old + 1).getDistance(new_n));
         //System.err.print("    total dist : " + _totalDistance);
-        _totalDistance -= (_tour.get(index_old - 1).getDistance(old_n) + _tour.get((index_old + 1 >= _tour.size())?0:index_old + 1).getDistance(old_n));
         //System.err.print("    total dist : " + _totalDistance);
-        _tour.remove(old_n);
-        _tour.add(index_old, new_n);
-        _totalDistance += (_tour.get(index_old - 1).getDistance(new_n) + _tour.get((index_old + 1 >= _tour.size())?0:index_old + 1).getDistance(new_n));
         //System.err.println("    total dist : " + _totalDistance);
-        _totalOrders += (new_n.getOrder() - old_n.getOrder());
     }
 
     /**
@@ -178,7 +186,7 @@ public class NodeMapLight implements Serializable {
      */
     public void changeNodeTour(NodeMapLight other) {
         Node otherNode = other._tour.get(RandUtils.randInt(1, other._tour.size()));
-        if (otherNode.getOrder() > getRemainingSpace()) { return; }
+        if (otherNode.getOrder() > this.getRemainingSpace()) { return; }
         else {
             this.put(otherNode);
             other.removeSafe(otherNode); }
@@ -191,7 +199,9 @@ public class NodeMapLight implements Serializable {
      */
     public void removeSafe(Node n) {
         int index_n = _tour.indexOf(n);
-        _totalDistance -= (_tour.get(index_n - 1).getDistance(n) + _tour.get((index_n + 1 >= _tour.size())?0:index_n + 1).getDistance(n));
+        Node n_1 = _tour.get(index_n - 1); Node n_2 = _tour.get((index_n + 1 >= _tour.size())?0:index_n + 1);
+        double n_1_to_n = n_1.getDistance(n); double n_2_to_n = n_2.getDistance(n);
+        _totalDistance -= (n_1_to_n + n_2_to_n);
         _totalOrders -= n.getOrder();
         _tour.remove(n);
     }
@@ -241,7 +251,8 @@ public class NodeMapLight implements Serializable {
         clone._totalOrders = this._totalOrders;
         clone._totalDistance = this._totalDistance;
         clone._deposit = this._deposit.clone();
-        clone._tour = this._tour;
+        clone._tour = new ArrayList<>();
+        this._tour.parallelStream().forEachOrdered(node -> clone._tour.add(node.clone()));
         return clone;
     }
 

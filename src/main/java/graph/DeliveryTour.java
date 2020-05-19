@@ -47,7 +47,7 @@ public class DeliveryTour implements Serializable, Cloneable {
 
     public void changeNodeTour(DeliveryTour other) { _tour.changeNodeTour(other._tour); }
 
-    public double getTotalDistance() { return _tour.getTotalDistance(); }
+    public double getTotalDistance() { return _tour.calculateTotalDistance(); }
 
     @Override
     public String toString() {

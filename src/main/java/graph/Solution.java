@@ -1,6 +1,7 @@
 package graph;
 
 import utils.ForEachWrapper;
+import utils.FormatUtils;
 import utils.RandUtils;
 
 import java.io.Serializable;
@@ -108,6 +109,13 @@ public class Solution implements Serializable, Cloneable {
                 clone._deliveryTours.get(dt1_chngTour).changeNodeTour(clone._deliveryTours.get(dt2_chngTour));
                 return clone;
         }
+    }
+
+    public Solution finaliserSolution() {
+        List<DeliveryTour> new_dts = new ArrayList<>();
+        _deliveryTours.parallelStream().forEachOrdered(dt -> {if (!(FormatUtils.round(dt.getTotalDistance(), 1) == 0.0 && dt.getTotalOrders() == 0)){new_dts.add(dt);}});
+        this._deliveryTours = new_dts;
+        return this;
     }
 
     public boolean isBetterThan(Solution other) {

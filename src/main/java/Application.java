@@ -11,7 +11,14 @@ public class Application {
         Solution g3205 = DataLoader.read("3205");
         System.out.println(g3205.toString());
 
-        Solution bestg3205 = new SimulatedAnnealing(500, 0.99, 100, 0.01).processCurrent(g3205);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new DisplayResult(g3205);  // Let the constructor do the job
+            }
+        });
+
+        Solution bestg3205 = new SimulatedAnnealing(500, 0.99, 1000, 0.01).processCurrent(g3205);
 
 
         System.out.println(bestg3205.toString());
@@ -59,7 +66,7 @@ public class Application {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new DisplayResult(g3205); new DisplayResult(bestg3205); // Let the constructor do the job
+                new DisplayResult(bestg3205.finaliserSolution()); // Let the constructor do the job
             }
         });
 
