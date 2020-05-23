@@ -32,4 +32,8 @@ public class Couple<K extends Cloneable, V extends Cloneable> implements Seriali
                 Objects.equals(_value, couple._value);
     }
 
+    @Override
+    public String toString() {
+        return "[Key \n: "+_key.toString()+"\n , Value : \n"+_value.toString()+"\n ]";
+    }
 }

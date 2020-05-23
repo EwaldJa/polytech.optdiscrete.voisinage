@@ -199,7 +199,7 @@ public class NodeMapLight implements Serializable {
      * Swaps two Nodes chosen randomly, one among other's, one among this instance's
      * @param other another NodeMap
      */
-    public void externalSwapRandom(NodeMapLight other) {
+    public void externalSwap(NodeMapLight other) {
         Node otherNode = other._tour.get(RandUtils.randInt(1, other._tour.size()));
         Node localNode = this._tour.get(RandUtils.randInt(1, this._tour.size()));
         if ((otherNode.getOrder() - localNode.getOrder()) > this.getRemainingSpace() ||
@@ -207,6 +207,13 @@ public class NodeMapLight implements Serializable {
         else {
             this.replaceNodeSafe(localNode, otherNode);
             other.replaceNodeSafe(otherNode, localNode); }
+    }
+
+    public void externalSwap(int localIndex, NodeMapLight other, int otherIndex) {
+        Node otherNode = other._tour.get(otherIndex);
+        Node localNode = this._tour.get(localIndex);
+        this.replaceNodeSafe(localNode, otherNode);
+        other.replaceNodeSafe(otherNode, localNode);
     }
 
 
@@ -245,6 +252,12 @@ public class NodeMapLight implements Serializable {
         else {
             this.put(otherNode);
             other.removeSafe(otherNode); }
+    }
+
+    public void changeNodeTour(NodeMapLight other, int otherindex) {
+        Node otherNode = other._tour.get(otherindex);
+        this.put(otherNode);
+        other.removeSafe(otherNode);
     }
 
 
@@ -291,6 +304,7 @@ public class NodeMapLight implements Serializable {
 
     public Node getDeposit() { return _deposit; }
 
+    public Node getNode(int index) { return _tour.get(index); }
 
     @Override
     public String toString() {

@@ -1,23 +1,24 @@
 package algo;
 
+import display.DisplayResult;
 import graph.Solution;
+import utils.ForEachWrapper;
 import utils.MathUtils;
 import utils.RandUtils;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TabuSearch extends Algorithm {
 
-    public static final int MAX_ITER_SAME_VALUE = 100;
-
-    private int _iterationNb, _neighbourNb, _tabuNb;
+    private int _iterationNb, _tabuNb, _maxIterSameValue;
     private List<Solution> _tabuList;
 
-    public TabuSearch(int iterationNb, int neighbourNb, int tabuNb) {
+    public TabuSearch(int iterationNb, int tabuNb, int maxIterSameValue) {
         this._iterationNb = iterationNb;
-        this._neighbourNb = neighbourNb;
         this._tabuNb = tabuNb;
+        this._maxIterSameValue = maxIterSameValue;
         this._tabuList = new ArrayList<>(tabuNb); //Initial capacity
     }
 
@@ -31,18 +32,9 @@ public class TabuSearch extends Algorithm {
         double baseDistance = baseSolution.getTotalDistance();
 
         for(int it = 0; it < _iterationNb; it++) {
-            Solution bestNeighbour = baseSolution.getBestNeighbour();
+            Solution bestNeighbour = baseSolution.getBestNeighbour(_tabuList);
             double bestNghbDist = bestNeighbour.getTotalDistance();
-            /*
-            for(int neighbour = 0; neighbour < _neighbourNb; neighbour++){
-                Solution rndmNeighbour = baseSolution.cloneRandom();
-                while (_tabuList.contains(rndmNeighbour)) {
-                    rndmNeighbour = baseSolution.cloneRandom(); }
-                double rndmDist = rndmNeighbour.getTotalDistance();
-                if (rndmDist < bestNghbDist) {
-                    bestNeighbour = rndmNeighbour;
-                    bestNghbDist = rndmDist; } }*/
-            if (bestNghbDist > baseDistance) {
+            if (bestNghbDist >= baseDistance) {
                 if(_tabuList.size() == _tabuNb) {
                     _tabuList.remove(0);
                     _tabuList.add(baseSolution); }
@@ -53,14 +45,14 @@ public class TabuSearch extends Algorithm {
                 bestDistance = bestNghbDist; }
             if (oldBestDistance == bestDistance) {
                 iterSameValue++;
-                if (iterSameValue == MAX_ITER_SAME_VALUE) {
+                if (iterSameValue == _maxIterSameValue) {
                     return bestSolution; } }
             else {
                 iterSameValue = 0; }
+            System.out.println("Iteration : " + it + ", bestDistance : " + bestDistance + ", bestNghbDist : " + bestNghbDist + ", iterSameValue : " + iterSameValue);
             oldBestDistance = bestDistance;
             baseSolution = bestNeighbour;
             baseDistance = bestNghbDist;
-            System.out.println("Iteration : " + it + ", bestDistance : " + bestDistance + ", baseDistance : " + baseDistance + ", iterSameValue : " + iterSameValue);
         }
         return bestSolution;
     }

@@ -13,4 +13,9 @@ public class CustomInteger implements Cloneable {
     public CustomInteger clone() {
         return new CustomInteger(this._value);
     }
+
+    @Override
+    public String toString() {
+        return ""+_value;
+    }
 }

@@ -103,7 +103,7 @@ public class Solution implements Serializable, Cloneable {
                 while (clone._deliveryTours.get(dt2_extSwapRand).getNodes().size() <= 1) {
                     dt2_extSwapRand = RandUtils.randInt(0, clone._deliveryTours.size(), dt1_extSwapRand);
                 }
-                clone._deliveryTours.get(dt1_extSwapRand).externalSwapRandom(clone._deliveryTours.get(dt2_extSwapRand));
+                clone._deliveryTours.get(dt1_extSwapRand).externalSwap(clone._deliveryTours.get(dt2_extSwapRand));
                 return clone;
             case 2:
                 //le deuxieme doit etre de taille > 1
@@ -117,7 +117,7 @@ public class Solution implements Serializable, Cloneable {
         }
     }
 
-    public Solution getBestNeighbour() {
+    public Solution getBestNeighbour(List<Solution> tabuList) {
         Solution bestNeighbour = null;
         Solution clone = null;
         double bestDistance = Double.POSITIVE_INFINITY;
@@ -125,27 +125,84 @@ public class Solution implements Serializable, Cloneable {
         /*All internalSwap neighbours*/
         clone = clone();
         ForEachWrapper<Solution> cloneWrap = new ForEachWrapper<>(clone);
-        double bestDeliveryTourImprovedDist = Double.NEGATIVE_INFINITY;
-        DeliveryTour bestDeliveryTour = null;
-        int bestDeliveryTourIndex = -1;
-        List<Couple<Couple<DeliveryTour, CustomDouble>, CustomInteger>> bestDTinternNeighbour = new ArrayList<>(_deliveryTours.size());
-        clone._deliveryTours.parallelStream().forEach(deliveryTour -> bestDTinternNeighbour.add(new Couple<>(deliveryTour.getBestInternalSwapNeighbour(), new CustomInteger(cloneWrap.value._deliveryTours.indexOf(deliveryTour)))));
-        for (Couple<Couple<DeliveryTour, CustomDouble>, CustomInteger> couple:bestDTinternNeighbour) {
+        ForEachWrapper<Solution> dtcloneWrap = new ForEachWrapper<>(clone());
+        ForEachWrapper<Double> bestDistanceWrapper = new ForEachWrapper<>(bestDistance);
+        ForEachWrapper<Solution> bestNeighbourWrapper = new ForEachWrapper<>(bestNeighbour);
+        clone._deliveryTours.parallelStream().forEach(deliveryTour -> {
+            if (deliveryTour.getNodesNb() > 1) {
+                int dt_index = cloneWrap.value._deliveryTours.indexOf(deliveryTour);
+                DeliveryTour dtClone = null;
+                for(int i = 1; i < deliveryTour.getNodesNb() - 1; i++) {
+                    for (int j = i + 1; j < deliveryTour.getNodesNb(); j++) {
+                        dtClone = deliveryTour.clone();
+                        dtClone.internalSwap(i,j);
+                        Solution subclone = dtcloneWrap.value.clone();
+                        subclone._deliveryTours.remove(dt_index);
+                        subclone._deliveryTours.add(dt_index, dtClone);
+                        if (!tabuList.contains(subclone) && subclone.getTotalDistance() < bestDistanceWrapper.value) {
+                            bestDistanceWrapper.value = subclone.getTotalDistance();
+                            bestNeighbourWrapper.value = subclone.clone(); } } } }
+        });
+        /*for (Couple<Couple<DeliveryTour, CustomDouble>, CustomInteger> couple:bestDTinternNeighbour) {
             if (couple.getKey().getValue()._value > bestDeliveryTourImprovedDist) {
                 bestDeliveryTour = couple.getKey().getKey();
                 bestDeliveryTourImprovedDist = couple.getKey().getValue()._value;
-                bestDeliveryTourIndex = couple.getValue()._value; } }
-        //Reconstructs the solution
-        clone._deliveryTours.remove(bestDeliveryTourIndex);
-        clone._deliveryTours.add(bestDeliveryTourIndex, bestDeliveryTour);
-        bestNeighbour = clone.clone();
-        bestDistance = clone.getTotalDistance();
+                bestDeliveryTourIndex = couple.getValue()._value; } }*/
+
+
+
+        //Reconstructs the solution, getting the best ones first and checking whether or not they are in the Tabu list
+        /*
+        bestDTinternNeighbour.sort(Comparator.comparingDouble(c -> c.getKey().getValue()._value));
+        for (int i = bestDTinternNeighbour.size() - 1; i >= 0; i--) {
+            Couple<Couple<DeliveryTour, CustomDouble>, CustomInteger> couple = bestDTinternNeighbour.get(i);
+            Solution subclone = clone.clone();
+            subclone._deliveryTours.remove(couple.getValue()._value);
+            subclone._deliveryTours.add(couple.getValue()._value, couple.getKey().getKey());
+            if (!tabuList.contains(subclone) && subclone.getTotalDistance() < bestDistance) {
+                bestNeighbour = subclone.clone();
+                bestDistance = subclone.getTotalDistance();
+                break; } }
+         */
 
         /*All externalSwap neighbours*/
-
+        clone = clone();
+        for(int i = 0; i < clone._deliveryTours.size() - 1; i++) {
+            DeliveryTour dt_i = clone._deliveryTours.get(i);
+            int i_remainingSpace = dt_i.remainingSpace();
+            for(int j = i + 1; j < clone._deliveryTours.size(); j++) {
+                DeliveryTour dt_j = clone._deliveryTours.get(j);
+                int j_remainingSpace = dt_j.remainingSpace();
+                for(int node_i_index = 1; node_i_index < dt_i.getNodesNb(); node_i_index++) {
+                    Node node_i = dt_i.getNode(node_i_index);
+                    for(int node_j_index = 1; node_j_index < dt_j.getNodesNb(); node_j_index++) {
+                        Node node_j = dt_j.getNode(node_j_index);
+                        if (node_j.getOrder() - node_i.getOrder() <= i_remainingSpace && node_i.getOrder() - node_j.getOrder() <= j_remainingSpace) {
+                            Solution subclone = clone.clone();
+                            subclone._deliveryTours.get(i).externalSwap(node_i_index, subclone._deliveryTours.get(j), node_j_index);
+                            if (!tabuList.contains(subclone) && subclone.getTotalDistance() < bestDistance) {
+                                bestNeighbour = subclone.clone();
+                                bestDistance = subclone.getTotalDistance(); } } } } } }
 
 
         /*All changeTour neighbours*/
+        clone = clone();
+        for(int i = 0; i < clone._deliveryTours.size() - 1; i++) {
+            DeliveryTour dt_i = clone._deliveryTours.get(i);
+            for(int j = i + 1; j < clone._deliveryTours.size(); j++) {
+                int j_remainingSpace = clone._deliveryTours.get(j).remainingSpace();
+                for(int node_i_index = 1; node_i_index < dt_i.getNodesNb(); node_i_index++) {
+                    if (dt_i.getNode(node_i_index).getOrder() <= j_remainingSpace) {
+                        Solution subclone = clone.clone();
+                        subclone._deliveryTours.get(j).changeNodeTour(subclone._deliveryTours.get(i), node_i_index);
+                        if (!tabuList.contains(subclone) && subclone.getTotalDistance() < bestDistance) {
+                            bestNeighbour = subclone.clone();
+                            bestDistance = subclone.getTotalDistance();
+                        }
+                    }
+                }
+            }
+        }
 
         return bestNeighbour;
     }

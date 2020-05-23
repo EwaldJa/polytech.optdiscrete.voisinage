@@ -21,7 +21,7 @@ public class Application {
 
         //Solution bestg3205 = new SimulatedAnnealing(500, 0.999, 200).processCurrent(g3205);
 
-        Solution bestg3205 = new TabuSearch(10000, 500, 30).processCurrent(g3205);
+        Solution bestg3205 = new TabuSearch(10000, 50, 10000).processCurrent(g3205);
 
         System.out.println(bestg3205.toString());
 
@@ -52,7 +52,7 @@ public class Application {
         System.out.println(dt_1_3205.toString());
         System.out.println("    dt1 nodelist :");
         dt_1_3205.getNodes().forEach(node -> System.out.println("      " + node.toString()));
-        dt_0_3205.externalSwapRandom(dt_1_3205);
+        dt_0_3205.externalSwap(dt_1_3205);
         System.out.println("------\nAfter external swap");
         System.out.println("dt0");
         System.out.println(dt_0_3205.toString());

@@ -39,15 +39,21 @@ public class DeliveryTour implements Serializable, Cloneable {
 
     public List<Node> getNodes() { return _tour.getNodes(); }
 
+    public NodeMapLight getNodeMapLight() { return _tour; }
+
     public int getNodesNb() { return _tour.getSize(); }
+
+    public Node getNode(int index) { return _tour.getNode(index); }
 
     public List<Edge> getEdges() { return _tour.getEdges(); }
 
     public void internalSwapRandom() { _tour.internalSwapRandom(); }
 
-    public void externalSwapRandom(DeliveryTour other) { _tour.externalSwapRandom(other._tour); }
+    public void externalSwap(DeliveryTour other) { _tour.externalSwap(other._tour); }
 
     public void changeNodeTour(DeliveryTour other) { _tour.changeNodeTour(other._tour); }
+
+    public void internalSwap(int index1, int index2) { _tour.internalSwap(index1, index2); }
 
     public Couple<DeliveryTour, CustomDouble> getBestInternalSwapNeighbour() {
         double bestDistance = Double.POSITIVE_INFINITY;
@@ -64,8 +70,11 @@ public class DeliveryTour implements Serializable, Cloneable {
         return new Couple<>(dt, new CustomDouble(_tour.getTotalDistance() - bestDistance));
     }
 
-    public double getTotalDistance() {
-        return _tour.getTotalDistance(); }
+    public void externalSwap(int localIndex, DeliveryTour other, int otherIndex) { _tour.externalSwap(localIndex, other._tour, otherIndex); }
+
+    public void changeNodeTour(DeliveryTour other, int otherindex) { _tour.changeNodeTour(other._tour, otherindex); }
+
+    public double getTotalDistance() { return _tour.getTotalDistance(); }
 
     @Override
     public String toString() {
