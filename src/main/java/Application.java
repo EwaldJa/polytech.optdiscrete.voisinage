@@ -19,7 +19,7 @@ public class Application {
             }
         });
 
-        //Solution bestg3205 = new SimulatedAnnealing(500, 0.9999, 100).processCurrent(g3205);
+        //Solution bestg3205 = new SimulatedAnnealing(500, 0.999, 200).processCurrent(g3205);
 
         Solution bestg3205 = new TabuSearch(10000, 500, 30).processCurrent(g3205);
 

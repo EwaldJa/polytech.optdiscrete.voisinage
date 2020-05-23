@@ -26,12 +26,14 @@ public class TabuSearch extends Algorithm {
         int iterSameValue = 0;
         Solution bestSolution = current.clone();
         double bestDistance = bestSolution.getTotalDistance();
+        double oldBestDistance = bestDistance;
         Solution baseSolution = current.clone();
         double baseDistance = baseSolution.getTotalDistance();
 
         for(int it = 0; it < _iterationNb; it++) {
-            Solution bestNeighbour = baseSolution.clone();
+            Solution bestNeighbour = baseSolution.getBestNeighbour();
             double bestNghbDist = bestNeighbour.getTotalDistance();
+            /*
             for(int neighbour = 0; neighbour < _neighbourNb; neighbour++){
                 Solution rndmNeighbour = baseSolution.cloneRandom();
                 while (_tabuList.contains(rndmNeighbour)) {
@@ -39,7 +41,7 @@ public class TabuSearch extends Algorithm {
                 double rndmDist = rndmNeighbour.getTotalDistance();
                 if (rndmDist < bestNghbDist) {
                     bestNeighbour = rndmNeighbour;
-                    bestNghbDist = rndmDist; } }
+                    bestNghbDist = rndmDist; } }*/
             if (bestNghbDist > baseDistance) {
                 if(_tabuList.size() == _tabuNb) {
                     _tabuList.remove(0);
@@ -49,10 +51,13 @@ public class TabuSearch extends Algorithm {
             else if (bestNghbDist < bestDistance) {
                 bestSolution = bestNeighbour;
                 bestDistance = bestNghbDist; }
-            if (baseDistance == bestDistance) {
+            if (oldBestDistance == bestDistance) {
                 iterSameValue++;
                 if (iterSameValue == MAX_ITER_SAME_VALUE) {
                     return bestSolution; } }
+            else {
+                iterSameValue = 0; }
+            oldBestDistance = bestDistance;
             baseSolution = bestNeighbour;
             baseDistance = bestNghbDist;
             System.out.println("Iteration : " + it + ", bestDistance : " + bestDistance + ", baseDistance : " + baseDistance + ", iterSameValue : " + iterSameValue);

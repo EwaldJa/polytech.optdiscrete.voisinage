@@ -187,6 +187,15 @@ public class NodeMapLight implements Serializable {
     }
 
     /**
+     * Swaps the nodes specified by the two indexes
+     * @param index1
+     * @param index2
+     */
+    public void internalSwap(int index1, int index2) {
+        internalSwapSafe(_tour.get(index1), _tour.get(index2));
+    }
+
+    /**
      * Swaps two Nodes chosen randomly, one among other's, one among this instance's
      * @param other another NodeMap
      */
@@ -280,6 +289,8 @@ public class NodeMapLight implements Serializable {
         return dist;
     }
 
+    public Node getDeposit() { return _deposit; }
+
 
     @Override
     public String toString() {
@@ -313,4 +324,7 @@ public class NodeMapLight implements Serializable {
                 Objects.equals(_tour, nodeMap._tour);
     }
 
+    public int getSize() {
+        return _tour.size();
+    }
 }

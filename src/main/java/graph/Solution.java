@@ -74,9 +74,9 @@ public class Solution implements Serializable, Cloneable {
     public Solution clone() {
         Solution clone = new Solution();
         clone._deposit = this._deposit.clone();
-        clone._clients = new ArrayList<>();
+        clone._clients = Collections.synchronizedList(new ArrayList<>());
         this._clients.parallelStream().forEachOrdered(node -> clone._clients.add(node.clone()));
-        clone._deliveryTours = new ArrayList<>();
+        clone._deliveryTours = Collections.synchronizedList(new ArrayList<>());
         this._deliveryTours.parallelStream().forEachOrdered(dt -> clone._deliveryTours.add(dt.clone()));
         return clone;
     }
@@ -115,6 +115,39 @@ public class Solution implements Serializable, Cloneable {
                 clone._deliveryTours.get(dt1_chngTour).changeNodeTour(clone._deliveryTours.get(dt2_chngTour));
                 return clone;
         }
+    }
+
+    public Solution getBestNeighbour() {
+        Solution bestNeighbour = null;
+        Solution clone = null;
+        double bestDistance = Double.POSITIVE_INFINITY;
+
+        /*All internalSwap neighbours*/
+        clone = clone();
+        ForEachWrapper<Solution> cloneWrap = new ForEachWrapper<>(clone);
+        double bestDeliveryTourImprovedDist = Double.NEGATIVE_INFINITY;
+        DeliveryTour bestDeliveryTour = null;
+        int bestDeliveryTourIndex = -1;
+        List<Couple<Couple<DeliveryTour, CustomDouble>, CustomInteger>> bestDTinternNeighbour = new ArrayList<>(_deliveryTours.size());
+        clone._deliveryTours.parallelStream().forEach(deliveryTour -> bestDTinternNeighbour.add(new Couple<>(deliveryTour.getBestInternalSwapNeighbour(), new CustomInteger(cloneWrap.value._deliveryTours.indexOf(deliveryTour)))));
+        for (Couple<Couple<DeliveryTour, CustomDouble>, CustomInteger> couple:bestDTinternNeighbour) {
+            if (couple.getKey().getValue()._value > bestDeliveryTourImprovedDist) {
+                bestDeliveryTour = couple.getKey().getKey();
+                bestDeliveryTourImprovedDist = couple.getKey().getValue()._value;
+                bestDeliveryTourIndex = couple.getValue()._value; } }
+        //Reconstructs the solution
+        clone._deliveryTours.remove(bestDeliveryTourIndex);
+        clone._deliveryTours.add(bestDeliveryTourIndex, bestDeliveryTour);
+        bestNeighbour = clone.clone();
+        bestDistance = clone.getTotalDistance();
+
+        /*All externalSwap neighbours*/
+
+
+
+        /*All changeTour neighbours*/
+
+        return bestNeighbour;
     }
 
     public Solution finaliserSolution() {
