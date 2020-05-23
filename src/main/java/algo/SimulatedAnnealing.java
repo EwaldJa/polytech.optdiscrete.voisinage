@@ -6,8 +6,6 @@ import utils.RandUtils;
 
 public class SimulatedAnnealing extends Algorithm {
 
-    public static final int MAX_ITER_SAME_VALUE = 100;
-
     private double _temperature, _coolingFactor;
     private int _neighbourNb;
 
