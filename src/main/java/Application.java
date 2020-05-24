@@ -37,8 +37,8 @@ public class Application {
                 new DisplayResult(s3305);  // Let the constructor do the job
             }
         });
-        /*
-        Solution tabus3305 = new TabuSearch(6000, 100, 500).processCurrent(s3305.clone());
+
+        Solution tabus3305 = new TabuSearch(6000, 150, 500).processCurrent(s3305.clone());
         System.out.println(tabus3305.toString());
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -46,13 +46,13 @@ public class Application {
                 new DisplayResult(tabus3305.clone().finaliserSolution()); // Let the constructor do the job
             }
         });
-*/
-        Solution bests3305 = new SimulatedAnnealing(500, 0.99, 2000).processCurrent(s3305.clone());
-        System.out.println(bests3305.toString());
+
+        Solution simulatedannealings3305 = new SimulatedAnnealing(500, 0.99, 2000).processCurrent(s3305.clone());
+        System.out.println(simulatedannealings3305.toString());
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new DisplayResult(bests3305.finaliserSolution()); // Let the constructor do the job
+                new DisplayResult(simulatedannealings3305.finaliserSolution()); // Let the constructor do the job
             }
         });
 
