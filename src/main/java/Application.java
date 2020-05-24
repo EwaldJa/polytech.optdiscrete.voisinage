@@ -29,7 +29,7 @@ public class Application {
 */
 
 
-        Solution s3305 = DataLoader.read("3205");
+        Solution s3305 = DataLoader.read("3305");
         System.out.println(s3305.toString());
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -37,7 +37,8 @@ public class Application {
                 new DisplayResult(s3305);  // Let the constructor do the job
             }
         });
-        Solution tabus3305 = new TabuSearch(6000, 250, 500).processCurrent(s3305);
+        /*
+        Solution tabus3305 = new TabuSearch(6000, 100, 500).processCurrent(s3305.clone());
         System.out.println(tabus3305.toString());
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -45,8 +46,8 @@ public class Application {
                 new DisplayResult(tabus3305.clone().finaliserSolution()); // Let the constructor do the job
             }
         });
-
-        Solution bests3305 = new SimulatedAnnealing(5000, 0.99, 300).processCurrent(tabus3305.clone());
+*/
+        Solution bests3305 = new SimulatedAnnealing(500, 0.99, 2000).processCurrent(s3305.clone());
         System.out.println(bests3305.toString());
         SwingUtilities.invokeLater(new Runnable() {
             @Override

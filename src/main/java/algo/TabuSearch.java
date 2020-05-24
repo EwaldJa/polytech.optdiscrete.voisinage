@@ -1,21 +1,28 @@
 package algo;
 
-import display.DisplayResult;
 import graph.Solution;
-import utils.ForEachWrapper;
 import utils.FormatUtils;
-import utils.MathUtils;
-import utils.RandUtils;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * This class is used to perform Tabu Search algorithm
+ *
+ * @author Ewald Janin, Lucas Aupoil
+ */
 public class TabuSearch extends Algorithm {
 
     private int _iterationNb, _tabuNb, _maxIterSameValue;
     private List<Solution> _tabuList;
 
+    /**
+     * Constructs an instance of the algorithm with the specified parameters
+     * @param iterationNb max number of iterations
+     * @param tabuNb the size of the tabu list
+     * @param maxIterSameValue a stopping condition that stops the algorithm if it stalled (a value <=0 disables this functionality)
+     */
     public TabuSearch(int iterationNb, int tabuNb, int maxIterSameValue) {
         this._iterationNb = iterationNb;
         this._tabuNb = tabuNb;
@@ -23,6 +30,10 @@ public class TabuSearch extends Algorithm {
         this._tabuList = new ArrayList<>(tabuNb); //Initial capacity
     }
 
+    /**
+     * returns the result of the algorithm on the given Solution
+     * @param current the Solution to process
+     */
     @Override
     public Solution processCurrent(Solution current) {
         int iterSameValue = 0;
@@ -44,12 +55,14 @@ public class TabuSearch extends Algorithm {
             else if (bestNghbDist < bestDistance) {
                 bestSolution = bestNeighbour;
                 bestDistance = bestNghbDist; }
-            if (FormatUtils.round(oldBestDistance, 5) == FormatUtils.round(bestDistance, 5)) {
-                iterSameValue++;
-                if (iterSameValue == _maxIterSameValue) {
-                    return bestSolution; } }
-            else {
-                iterSameValue = 0; }
+            if (_maxIterSameValue > 0) {
+                if (FormatUtils.round(oldBestDistance, 5) == FormatUtils.round(bestDistance, 5)) {
+                    iterSameValue++;
+                    if (iterSameValue == _maxIterSameValue) {
+                        return bestSolution; } }
+                else {
+                    iterSameValue = 0; }
+            }
             System.out.println("Iteration : " + it + ", bestDistance : " + bestDistance + ", bestNghbDist : " + bestNghbDist + ", iterSameValue : " + iterSameValue);
             oldBestDistance = bestDistance;
             baseSolution = bestNeighbour;

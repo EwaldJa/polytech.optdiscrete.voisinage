@@ -1,7 +1,5 @@
 package graph;
 
-import utils.ForEachWrapper;
-import utils.MathUtils;
 import utils.RandUtils;
 
 import java.io.Serializable;
@@ -11,12 +9,14 @@ import java.util.Objects;
 
 /**
  * This class establish the links between the Nodes of a DeliveryTour
+ * It is a lighter version of NodeMap
  *
  * @author Ewald Janin, Lucas Aupoil
  * @see DeliveryTour
  * @see Solution
  * @see Edge
  * @see Node
+ * @see NodeMap
  */
 public class NodeMapLight implements Serializable {
 
@@ -24,7 +24,7 @@ public class NodeMapLight implements Serializable {
     private int _totalOrders;
     private double _totalDistance;
 
-    /*First Edge of Couple : incoming edge, and the second is the leaving edge (for instance fist one is between n1 and n2 and second one between n2 and n3)*/
+    /*The ordered List of all the Nodes*/
     private List<Node> _tour;
 
     private NodeMapLight(){}
@@ -210,6 +210,12 @@ public class NodeMapLight implements Serializable {
             other.replaceNodeSafe(otherNode, localNode); }
     }
 
+    /**
+     * Swaps two Nodes, one chosen among other's Nodes, one among this instance's Nodes
+     * @param other another NodeMapLight
+     * @param localIndex the index of the Node to swap on this NodeMapLight
+     * @param otherIndex the index of the Node to swap on other NodeMapLight
+     */
     public void externalSwap(int localIndex, NodeMapLight other, int otherIndex) {
         Node otherNode = other._tour.get(otherIndex);
         Node localNode = this._tour.get(localIndex);
@@ -255,6 +261,12 @@ public class NodeMapLight implements Serializable {
             other.removeSafe(otherNode); }
     }
 
+    /**
+     * Removes a Node from other NodeMapLight and puts it in current instance
+     * @param other another NodeMapLight
+     * @param otherindex index of the Node to remove on other NodeMapLight
+     * @param localindex index where to add the Node (from 1 to this._tour.size())
+     */
     public void changeNodeTour(NodeMapLight other, int otherindex, int localindex) {
         Node otherNode = other._tour.get(otherindex);
         this.put(localindex, otherNode);
@@ -291,12 +303,15 @@ public class NodeMapLight implements Serializable {
     public int getRemainingSpace() { return DeliveryTour.MAX_CAPACITY - _totalOrders; }
 
     /**
-     * @return the total distance between all the clients of this delivery tour
+     * @return the total distance between all the clients of this delivery tour that is kept up to date during programm running
      */
     public double getTotalDistance() {
         return _totalDistance;
     }
 
+    /**
+     * @return the total distance by recalculating it
+     */
     public double calculateTotalDistance() {
         double dist = 0.0;
         for (int i = 1; i < _tour.size(); i++) {

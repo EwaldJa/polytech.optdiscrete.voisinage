@@ -6,6 +6,18 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * A custom Map that allows replacing and swapping keys, and cloning the map.
+ * Deprecated, not using since now using a List in NodeMapLight
+ *
+ * @param <K>
+ * @param <V>
+ *
+ * @author Ewald Janin, Lucas Aupoil
+ * @see NodeMapLight
+ * @see NodeMap
+ */
+@Deprecated
 public class FlexMap <K extends Cloneable, V extends Cloneable> implements Serializable, Map<K, V>, Cloneable {
 
     private Map<K,V> _values;

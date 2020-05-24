@@ -7,14 +7,17 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * This class establish the links between the Nodes of a DeliveryTour
+ * This class establish the links between the Nodes of a DeliveryTour.
+ * Deprecated, consider using NodeMapLight instead
  *
  * @author Ewald Janin, Lucas Aupoil
+ * @see NodeMapLight
  * @see DeliveryTour
  * @see Solution
  * @see Edge
  * @see Node
  */
+@Deprecated
 public class NodeMap implements Serializable {
 
     private Node _deposit, _lastNode;

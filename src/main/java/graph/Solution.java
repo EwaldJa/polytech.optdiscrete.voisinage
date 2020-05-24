@@ -12,7 +12,6 @@ import java.util.*;
  * It is used in the project to find optimum solutions to the Capacitated Vehicule Routing Problem.
  *
  * @author Ewald Janin, Lucas Aupoil
- * @see Edge
  * @see Node
  * @see DeliveryTour
  */
@@ -22,8 +21,16 @@ public class Solution implements Serializable, Cloneable {
     private List<Node> _clients;
     private List<DeliveryTour> _deliveryTours;
 
+    /**
+     * Only used when cloning
+     */
     private Solution() {}
 
+    /**
+     * Constructs a Solution with randomly filled DeliveryTours (max 60% of their capacity)
+     * @param deposit the origin Node of all deliveries, the deposit with the orders
+     * @param clients all the Nodes instanciated
+     */
     public Solution(Node deposit, List<Node> clients) {
         _deposit = deposit;
         _clients = clients;
@@ -51,23 +58,29 @@ public class Solution implements Serializable, Cloneable {
         return sb.toString();
     }
 
-
+    /**
+     * @return the list of all the DeliveryTours of this Solution
+     */
     public List<DeliveryTour> getDeliveryTours() { return _deliveryTours; }
 
+    /**
+     * @return the Node corresponding to the starting point of all deliveries
+     */
     public Node getDeposit() { return  _deposit; }
 
-    public double getTotalDistanceParallel() {
-        ForEachWrapper<Double> val = new ForEachWrapper<>(0.0);
-        _deliveryTours.parallelStream().forEachOrdered(dt -> val.value+=(dt.getTotalDistance()));
-        return val.value;
-    }
 
+    /**
+     * @return the total distance of this Solution : the sum of the distance of all of its DeliveryTours
+     */
     public double getTotalDistance() {
         double sum = 0.0;
         for(DeliveryTour dt:_deliveryTours) { sum += dt.getTotalDistance(); }
         return sum;
     }
 
+    /**
+     * @return a clone of this Solution
+     */
     public Solution clone() {
         Solution clone = new Solution();
         clone._deposit = this._deposit.clone();
@@ -78,6 +91,14 @@ public class Solution implements Serializable, Cloneable {
         return clone;
     }
 
+    /**
+     * Generates a clone of this solution with one random atomical operation performed on it, so that it is a direct neighbour.
+     * Possible operations are :
+     *  - switching two randomly chosen Nodes inside a randomly chosen DeliveryTour of the Solution
+     *  - switching two Nodes randomly chosen among two randomly chosen DeliveryTours of the Solution
+     *  - removing a randomly chosen Node from a randomly chosen DeliveryTour, and putting it in another randomly chosen DeliveryTour
+     * @return the generated direct neighbour
+     */
     public Solution cloneRandom() {
         Solution clone = clone();
         int randomStyle = RandUtils.randInt(0, 3);
@@ -115,6 +136,11 @@ public class Solution implements Serializable, Cloneable {
         }
     }
 
+    /**
+     * Generates all the possible one-atomical-operation-far neighbour that are not in the tabuList, returns the best one
+     * @param tabuList the List of all tabu Solutions
+     * @return the best one-atomical-operation-far neighbour
+     */
     public Solution getBestNeighbour(List<Solution> tabuList) {
         Solution bestNeighbour = null;
         Solution clone = null;
@@ -141,27 +167,6 @@ public class Solution implements Serializable, Cloneable {
                             bestDistanceWrapper.value = subclone.getTotalDistance();
                             bestNeighbourWrapper.value = subclone.clone(); } } } }
         });
-        /*for (Couple<Couple<DeliveryTour, CustomDouble>, CustomInteger> couple:bestDTinternNeighbour) {
-            if (couple.getKey().getValue()._value > bestDeliveryTourImprovedDist) {
-                bestDeliveryTour = couple.getKey().getKey();
-                bestDeliveryTourImprovedDist = couple.getKey().getValue()._value;
-                bestDeliveryTourIndex = couple.getValue()._value; } }*/
-
-
-
-        //Reconstructs the solution, getting the best ones first and checking whether or not they are in the Tabu list
-        /*
-        bestDTinternNeighbour.sort(Comparator.comparingDouble(c -> c.getKey().getValue()._value));
-        for (int i = bestDTinternNeighbour.size() - 1; i >= 0; i--) {
-            Couple<Couple<DeliveryTour, CustomDouble>, CustomInteger> couple = bestDTinternNeighbour.get(i);
-            Solution subclone = clone.clone();
-            subclone._deliveryTours.remove(couple.getValue()._value);
-            subclone._deliveryTours.add(couple.getValue()._value, couple.getKey().getKey());
-            if (!tabuList.contains(subclone) && subclone.getTotalDistance() < bestDistance) {
-                bestNeighbour = subclone.clone();
-                bestDistance = subclone.getTotalDistance();
-                break; } }
-         */
 
         /*All externalSwap neighbours*/
         clone = clone();
@@ -208,6 +213,10 @@ public class Solution implements Serializable, Cloneable {
         return bestNeighbour;
     }
 
+    /**
+     * Removes empty DeliveryTours (with only the deposit in them)
+     * @return the Solution without its empty DeliveryTour
+     */
     public Solution finaliserSolution() {
         List<DeliveryTour> new_dts = new ArrayList<>();
         _deliveryTours.parallelStream().forEachOrdered(dt -> {if (!(FormatUtils.round(dt.getTotalDistance(), 1) == 0.0 && dt.getTotalOrders() == 0)){new_dts.add(dt);}});
@@ -215,6 +224,11 @@ public class Solution implements Serializable, Cloneable {
         return this;
     }
 
+    /**
+     * Checks wether this Solution is better than the given one
+     * @param other the other Solution to compare this one with
+     * @return boolean, true if this solution is better, false if other Solution is better
+     */
     public boolean isBetterThan(Solution other) {
         if (other == null) {
             return true; }

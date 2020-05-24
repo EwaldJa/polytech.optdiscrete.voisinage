@@ -7,9 +7,10 @@ import java.util.List;
 
 /**
  * This class models a delivery tour, with a subset of the Nodes of a Solution
+ * See NodeMapLight for the documentation
  *
  * @author Ewald Janin, Lucas Aupoil
- * @see NodeMap
+ * @see NodeMapLight
  * @see Solution
  * @see Edge
  * @see Node
@@ -39,8 +40,6 @@ public class DeliveryTour implements Serializable, Cloneable {
 
     public List<Node> getNodes() { return _tour.getNodes(); }
 
-    public NodeMapLight getNodeMapLight() { return _tour; }
-
     public int getNodesNb() { return _tour.getSize(); }
 
     public Node getNode(int index) { return _tour.getNode(index); }
@@ -54,21 +53,6 @@ public class DeliveryTour implements Serializable, Cloneable {
     public void changeNodeTour(DeliveryTour other) { _tour.changeNodeTour(other._tour); }
 
     public void internalSwap(int index1, int index2) { _tour.internalSwap(index1, index2); }
-
-    public Couple<DeliveryTour, CustomDouble> getBestInternalSwapNeighbour() {
-        double bestDistance = Double.POSITIVE_INFINITY;
-        NodeMapLight clone = null, bestNodeMap = null;
-        for(int i = 1; i < _tour.getSize() - 1; i++) {
-            for (int j = i + 1; j < _tour.getSize(); j++) {
-                clone = _tour.clone();
-                clone.internalSwap(i,j);
-                if (clone.getTotalDistance() < bestDistance) {
-                    bestDistance = clone.getTotalDistance();
-                    bestNodeMap = clone.clone(); } } }
-        DeliveryTour dt = new DeliveryTour(_tour.getDeposit());
-        dt._tour = bestNodeMap;
-        return new Couple<>(dt, new CustomDouble(_tour.getTotalDistance() - bestDistance));
-    }
 
     public void externalSwap(int localIndex, DeliveryTour other, int otherIndex) { _tour.externalSwap(localIndex, other._tour, otherIndex); }
 
