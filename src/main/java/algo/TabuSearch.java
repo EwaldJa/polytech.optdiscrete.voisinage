@@ -3,6 +3,7 @@ package algo;
 import display.DisplayResult;
 import graph.Solution;
 import utils.ForEachWrapper;
+import utils.FormatUtils;
 import utils.MathUtils;
 import utils.RandUtils;
 
@@ -43,7 +44,7 @@ public class TabuSearch extends Algorithm {
             else if (bestNghbDist < bestDistance) {
                 bestSolution = bestNeighbour;
                 bestDistance = bestNghbDist; }
-            if (oldBestDistance == bestDistance) {
+            if (FormatUtils.round(oldBestDistance, 5) == FormatUtils.round(bestDistance, 5)) {
                 iterSameValue++;
                 if (iterSameValue == _maxIterSameValue) {
                     return bestSolution; } }

@@ -72,7 +72,7 @@ public class DeliveryTour implements Serializable, Cloneable {
 
     public void externalSwap(int localIndex, DeliveryTour other, int otherIndex) { _tour.externalSwap(localIndex, other._tour, otherIndex); }
 
-    public void changeNodeTour(DeliveryTour other, int otherindex) { _tour.changeNodeTour(other._tour, otherindex); }
+    public void changeNodeTour(DeliveryTour other, int otherindex, int localindex) { _tour.changeNodeTour(other._tour, otherindex, localindex); }
 
     public double getTotalDistance() { return _tour.getTotalDistance(); }
 

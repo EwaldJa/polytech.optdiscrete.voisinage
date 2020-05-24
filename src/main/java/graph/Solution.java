@@ -26,22 +26,19 @@ public class Solution implements Serializable, Cloneable {
 
     public Solution(Node deposit, List<Node> clients) {
         _deposit = deposit;
-        _clients = new ArrayList<>();
+        _clients = clients;
         _deliveryTours = new ArrayList<>();
 
-        int nbOfClients = clients.size();
-        //TODO : refactorer avec Collections.shuffle
-        while (clients.size() > 0 && _clients.size() <= nbOfClients) {
-            DeliveryTour dt = new DeliveryTour(_deposit);
-            int clientIndex = RandUtils.randInt(0, clients.size());
-            while(clients.size() > 0 && clients.get(clientIndex).getOrder() <= dt.remainingSpaceInit()) {
-                dt.append(clients.get(clientIndex));
-                _clients.add(clients.get(clientIndex));
-                clients.remove(clients.get(clientIndex));
-                clientIndex = RandUtils.randInt(0, clients.size());
-            }
-            _deliveryTours.add(dt);
+        Collections.shuffle(_clients);
+
+        DeliveryTour dt = new DeliveryTour(_deposit);
+        for(Node client:_clients) {
+            if (client.getOrder() > dt.remainingSpaceInit()) {
+                _deliveryTours.add(dt);
+                dt = new DeliveryTour(_deposit); }
+            dt.append(client);
         }
+        _deliveryTours.add(dt);
     }
 
     @Override
@@ -106,6 +103,7 @@ public class Solution implements Serializable, Cloneable {
                 clone._deliveryTours.get(dt1_extSwapRand).externalSwap(clone._deliveryTours.get(dt2_extSwapRand));
                 return clone;
             case 2:
+                //TODO: insérer possiblement au milieu
                 //le deuxieme doit etre de taille > 1
                 int dt1_chngTour = RandUtils.randInt(0, clone._deliveryTours.size());
                 int dt2_chngTour = RandUtils.randInt(0, clone._deliveryTours.size(), dt1_chngTour);
@@ -190,14 +188,17 @@ public class Solution implements Serializable, Cloneable {
         for(int i = 0; i < clone._deliveryTours.size() - 1; i++) {
             DeliveryTour dt_i = clone._deliveryTours.get(i);
             for(int j = i + 1; j < clone._deliveryTours.size(); j++) {
-                int j_remainingSpace = clone._deliveryTours.get(j).remainingSpace();
+                DeliveryTour dt_j = clone._deliveryTours.get(j);
+                int j_remainingSpace = dt_j.remainingSpace();
                 for(int node_i_index = 1; node_i_index < dt_i.getNodesNb(); node_i_index++) {
                     if (dt_i.getNode(node_i_index).getOrder() <= j_remainingSpace) {
-                        Solution subclone = clone.clone();
-                        subclone._deliveryTours.get(j).changeNodeTour(subclone._deliveryTours.get(i), node_i_index);
-                        if (!tabuList.contains(subclone) && subclone.getTotalDistance() < bestDistance) {
-                            bestNeighbour = subclone.clone();
-                            bestDistance = subclone.getTotalDistance();
+                        for(int node_j_index = 1; node_j_index <= dt_j.getNodesNb(); node_j_index++) {
+                            Solution subclone = clone.clone();
+                            subclone._deliveryTours.get(j).changeNodeTour(subclone._deliveryTours.get(i), node_i_index, node_j_index);
+                            if (!tabuList.contains(subclone) && subclone.getTotalDistance() < bestDistance) {
+                                bestNeighbour = subclone.clone();
+                                bestDistance = subclone.getTotalDistance();
+                            }
                         }
                     }
                 }

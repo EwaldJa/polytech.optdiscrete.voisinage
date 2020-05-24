@@ -19,7 +19,7 @@ public class DisplayResult extends JFrame {
     public static final int CANVAS_WIDTH  = 1280;
     public static final int CANVAS_HEIGHT = 720;
 
-    public static final int INFOPANEL_WIDTH  = 350;
+    public static final int INFOPANEL_WIDTH  = 400;
     public static final int INFOLINE_HEIGHT  = 40;
 
     public static final int DEPOSIT_DOT_DIAMETER = 20;

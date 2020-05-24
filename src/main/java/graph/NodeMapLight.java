@@ -58,7 +58,8 @@ public class NodeMapLight implements Serializable {
      */
     public void put(int index, Node n) {
         if (index < 1 || index > _tour.size()) { throw new IllegalArgumentException("Index is not greater or equal to 1 or is bigger than size : " + index); }
-        Node n_A = _tour.get(index - 1); Node n_B = _tour.get(((index + 1 >= _tour.size())?0:index + 1));
+        Node n_A = _tour.get(index - 1);
+        Node n_B = _tour.get(((index >= _tour.size())?0:index));
 
         double n_A_to_n_B = n_A.getDistance(n_B);
         double n_A_to_n = n_A.getDistance(n);
@@ -250,13 +251,13 @@ public class NodeMapLight implements Serializable {
         Node otherNode = other._tour.get(RandUtils.randInt(1, other._tour.size()));
         if (otherNode.getOrder() > this.getRemainingSpace()) { return; }
         else {
-            this.put(otherNode);
+            this.put(RandUtils.randInt(1, this._tour.size() + 1), otherNode);
             other.removeSafe(otherNode); }
     }
 
-    public void changeNodeTour(NodeMapLight other, int otherindex) {
+    public void changeNodeTour(NodeMapLight other, int otherindex, int localindex) {
         Node otherNode = other._tour.get(otherindex);
-        this.put(otherNode);
+        this.put(localindex, otherNode);
         other.removeSafe(otherNode);
     }
 
@@ -267,9 +268,12 @@ public class NodeMapLight implements Serializable {
      */
     public void removeSafe(Node n) {
         int index_n = _tour.indexOf(n);
-        Node n_1 = _tour.get(index_n - 1); Node n_2 = _tour.get((index_n + 1 >= _tour.size())?0:index_n + 1);
-        double n_1_to_n = n_1.getDistance(n); double n_2_to_n = n_2.getDistance(n); double n_1_to_n_2 = n_1.getDistance(n_2);
-        _totalDistance = _totalDistance - (n_1_to_n + n_2_to_n) + n_1_to_n_2;
+        Node n_1 = _tour.get(index_n - 1);
+        Node n_2 = _tour.get((index_n + 1 >= _tour.size())?0:index_n + 1);
+        double n_1_to_n = n_1.getDistance(n);
+        double n_to_n_2 = n.getDistance(n_2);
+        double n_1_to_n_2 = n_1.getDistance(n_2);
+        _totalDistance = _totalDistance - (n_1_to_n + n_to_n_2) + n_1_to_n_2;
         _totalOrders -= n.getOrder();
         _tour.remove(n);
     }
